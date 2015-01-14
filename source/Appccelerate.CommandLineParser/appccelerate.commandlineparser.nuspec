@@ -1,0 +1,33 @@
+﻿<?xml version="1.0"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>Appccelerate.CommandLineParser</id>
+    <version>0.0.0</version>
+    <title>Appccelerate.CommandLineParser</title>
+    <authors>Appccelerate team</authors>
+    <owners>Appccelerate team</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/appccelerate/commandlineparser</projectUrl>
+    <iconUrl>https://github.com/appccelerate/appccelerate/raw/master/docs/nuget.png</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <summary>Command line parser with fluent definition syntax.</summary>
+    <description>Command line parser with fluent definition syntax.</description>
+    <releaseNotes>
+    </releaseNotes>
+    <copyright>Copyright 2015</copyright>
+    <tags>Appccelerate command-line-parser</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System" targetFramework="net45" />
+      <frameworkAssembly assemblyName="System.Core" targetFramework="net45" />
+    </frameworkAssemblies>
+    <dependencies>
+      <dependency id="Appccelerate.Fundamentals" version="[2.8,3.0)" />
+    </dependencies>	
+  </metadata>
+  <files>
+    <file src="bin\Release\Appccelerate.CommandLineParser.dll" target="lib\net45" />
+    <file src="bin\Release\Appccelerate.CommandLineParser.pdb" target="lib\net45" />
+    <file src="bin\Release\Appccelerate.CommandLineParser.xml" target="lib\net45" />
+    <file src="**\*.cs" target="src" />
+  </files>  
+</package>
