@@ -64,8 +64,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Help.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />
+    <Compile Include="Parsing.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Appccelerate.CommandLineParser\Appccelerate.CommandLineParser.csproj">
