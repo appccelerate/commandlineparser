@@ -26,14 +26,14 @@ namespace Appccelerate.CommandLineParser
     {
         private readonly IEnumerable<Action<string>> unnamed;
 
-        private readonly IEnumerable<Tuple<string, Action<string>>> named;
+        private readonly IEnumerable<NamedArgument> named;
 
         private readonly IEnumerable<Tuple<string, Action>> switches;
 
         public CommandLineConfiguration(
             IEnumerable<Action<string>> unnamed,
             IEnumerable<Tuple<string, Action>> switches,
-            IEnumerable<Tuple<string, Action<string>>> named)
+            IEnumerable<NamedArgument> named)
         {
             this.unnamed = unnamed;
             this.switches = switches;
@@ -56,7 +56,7 @@ namespace Appccelerate.CommandLineParser
             }
         }
 
-        public IEnumerable<Tuple<string, Action<string>>> Named
+        public IEnumerable<NamedArgument> Named
         {
             get
             {

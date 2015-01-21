@@ -33,7 +33,7 @@ namespace Appccelerate.CommandLineParser
         public ParseResult Parse(string[] args)
         {
             bool failed = false;
-
+            
             int wievielUnnamedMerSchoGhaHänd = 0;
             for (int i = 0; i < args.Length; i++)
             {
@@ -51,11 +51,12 @@ namespace Appccelerate.CommandLineParser
                     }
                     else
                     {
-                        Tuple<string, Action<string>> named = this.configuration.Named.SingleOrDefault(n => n.Item1 == name);
+                        NamedArgument named = this.configuration.Named.SingleOrDefault(n => n.Name == name);
 
                         if (named != null && i < args.Length - 1)
                         {
-                            named.Item2(args[++i]);
+                            named.Callback(args[++i]);
+                            named.Required = false;
                         }
                         else
                         {
@@ -74,6 +75,11 @@ namespace Appccelerate.CommandLineParser
                         failed = true;
                     }
                 }
+            }
+
+            if (this.configuration.Named.Any(n => n.Required))
+            {
+                failed = true;
             }
 
             return new ParseResult(!failed);

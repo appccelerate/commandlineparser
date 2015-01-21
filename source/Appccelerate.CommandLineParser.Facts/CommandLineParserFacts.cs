@@ -43,7 +43,7 @@ namespace Appccelerate.CommandLineParser.Facts
                         x => parsedArguments[1] = x
                     }, 
                     null,
-                    null);
+                    Enumerable.Empty<NamedArgument>());
             var testee = new CommandLineParser(configuration);
             
             testee.Parse(new[] { FirstArgument, SecondArgument });
@@ -63,8 +63,8 @@ namespace Appccelerate.CommandLineParser.Facts
 
             var namedArguments = new[]
                                  {
-                                     new Tuple<string, Action<string>>(FirstName, x => parsedArguments[0] = x),
-                                     new Tuple<string, Action<string>>(SecondName, x => parsedArguments[1] = x)
+                                     new NamedArgument(FirstName, x => parsedArguments[0] = x), 
+                                     new NamedArgument(SecondName, x => parsedArguments[1] = x)
                                  };
             var configuration = new CommandLineConfiguration(
                 null,
@@ -91,7 +91,7 @@ namespace Appccelerate.CommandLineParser.Facts
             var configuration = new CommandLineConfiguration(
                 null,
                 switches,
-                null);
+                Enumerable.Empty<NamedArgument>());
             var testee = new CommandLineParser(configuration);
 
             testee.Parse(new[] { "-switch", "-switchReloaded" });
@@ -101,12 +101,26 @@ namespace Appccelerate.CommandLineParser.Facts
         }
 
         [Fact]
+        public void Fails_WhenRequiredArgumentIsMissing()
+        {
+            var configuration = new CommandLineConfiguration(
+            Enumerable.Empty<Action<string>>(),
+            Enumerable.Empty<Tuple<string, Action>>(),
+            new[] { new NamedArgument("name", v => { }) { Required = true } });
+            var testee = new CommandLineParser(configuration);
+
+            var result = testee.Parse(new string[] { });
+
+            result.Succeeded.Should().BeFalse();
+        }
+
+        [Fact]
         public void Fails_WhenTooManyUnnamedArguments()
         {
             var configuration = new CommandLineConfiguration(
                 Enumerable.Empty<Action<string>>(),
                 Enumerable.Empty<Tuple<string, Action>>(),
-                Enumerable.Empty<Tuple<string, Action<string>>>());
+                Enumerable.Empty<NamedArgument>());
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new[] { "unknown" });
@@ -119,8 +133,8 @@ namespace Appccelerate.CommandLineParser.Facts
         {
             var configuration = new CommandLineConfiguration(
                 Enumerable.Empty<Action<string>>(), 
-                Enumerable.Empty<Tuple<string, Action>>(), 
-                Enumerable.Empty<Tuple<string, Action<string>>>());
+                Enumerable.Empty<Tuple<string, Action>>(),
+                Enumerable.Empty<NamedArgument>());
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new[] { "-unknown", "value" });
@@ -134,7 +148,7 @@ namespace Appccelerate.CommandLineParser.Facts
             var configuration = new CommandLineConfiguration(
                 Enumerable.Empty<Action<string>>(),
                 Enumerable.Empty<Tuple<string, Action>>(),
-                Enumerable.Empty<Tuple<string, Action<string>>>());
+                Enumerable.Empty<NamedArgument>());
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new[] { "-unknown" });
@@ -148,7 +162,7 @@ namespace Appccelerate.CommandLineParser.Facts
             var configuration = new CommandLineConfiguration(
                 Enumerable.Empty<Action<string>>(),
                 Enumerable.Empty<Tuple<string, Action>>(),
-                new[] { new Tuple<string, Action<string>>("known", s => { }) });
+                new[] { new NamedArgument("known", s => { }) });
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new[] { "-known" });

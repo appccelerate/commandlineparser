@@ -25,7 +25,10 @@ namespace Appccelerate.CommandLineParser
     {
         private readonly List<Action<string>> unnamed = new List<Action<string>>();
         private readonly List<Tuple<string, Action>> switches = new List<Tuple<string, Action>>();
-        private readonly List<Tuple<string, Action<string>>> named = new List<Tuple<string, Action<string>>>();
+
+        private readonly List<NamedArgument> named = new List<NamedArgument>();
+
+        private NamedArgument current;
 
         public static CommandLineParserConfigurator Create()
         {
@@ -39,9 +42,12 @@ namespace Appccelerate.CommandLineParser
             return this;
         }
         
-        public CommandLineParserConfigurator WithNamed(string name, Action<string> action)
+        public CommandLineParserConfigurator WithNamed(string name, Action<string> callback)
         {
-            this.named.Add(new Tuple<string, Action<string>>(name, action));
+            NamedArgument namedArgument = new NamedArgument(name, callback);
+            this.named.Add(namedArgument);
+
+            this.current = namedArgument;
 
             return this;
         }
@@ -56,6 +62,13 @@ namespace Appccelerate.CommandLineParser
         public CommandLineConfiguration BuildConfiguration()
         {
             return new CommandLineConfiguration(this.unnamed, this.switches, this.named);
+        }
+
+        public CommandLineParserConfigurator Required()
+        {
+            this.current.Required = true;
+
+            return this;
         }
     }
 }

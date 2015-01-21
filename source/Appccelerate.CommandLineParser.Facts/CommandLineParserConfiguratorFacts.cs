@@ -61,11 +61,11 @@ namespace Appccelerate.CommandLineParser.Facts
 
             result.Named.Should().HaveCount(1);
 
-            result.Named.Single().Item2("a");
+            result.Named.Single().Callback("a");
 
             parsedArgument.Should().Be("a"); // UGLY!
 
-            result.Named.Single().Item1.Should().Be(Name);
+            result.Named.Single().Name.Should().Be(Name);
         }
 
         [Fact]
@@ -80,6 +80,22 @@ namespace Appccelerate.CommandLineParser.Facts
             result.Switches.Single().Item1.Should().Be("switch");
             result.Switches.Single().Item2();
             executed.Should().BeTrue();
+        }
+
+        [Fact]
+        public void BuildsRequiredNamedArguments()
+        {
+            const string Name = "name";
+
+            this.testee
+                .WithNamed(Name, x => { })
+                    .Required();
+
+            CommandLineConfiguration result = this.testee.BuildConfiguration();
+
+            result.Named.Should().HaveCount(1);
+
+            result.Named.Single().Required.Should().BeTrue();
         }
     }
 }
