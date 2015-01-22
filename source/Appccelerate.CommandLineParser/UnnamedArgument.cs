@@ -1,5 +1,5 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CommandLineConfiguration.cs" company="Appccelerate">
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="UnnamedArgument.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,24 +18,17 @@
 
 namespace Appccelerate.CommandLineParser
 {
-    using System.Collections.Generic;
+    using System;
 
-    public class CommandLineConfiguration
+    public class UnnamedArgument
     {
-        public CommandLineConfiguration(
-            IEnumerable<NamedArgument> named,
-            IEnumerable<UnnamedArgument> unnamed,
-            IEnumerable<Switch> switches)
+        public UnnamedArgument(Action<string> callback)
         {
-            this.Named = named;
-            this.Unnamed = unnamed;
-            this.Switches = switches;
+            this.Callback = callback;
         }
+        
+        public Action<string> Callback { get; private set; }
 
-        public IEnumerable<NamedArgument> Named { get; set; }
-
-        public IEnumerable<UnnamedArgument> Unnamed { get; private set; }
-
-        public IEnumerable<Switch> Switches { get; private set; }
+        public bool Required { get; set; }
     }
 }

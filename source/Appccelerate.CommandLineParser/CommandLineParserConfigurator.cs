@@ -23,10 +23,9 @@ namespace Appccelerate.CommandLineParser
 
     public class CommandLineParserConfigurator
     {
-        private readonly List<Action<string>> unnamed = new List<Action<string>>();
-        private readonly List<Tuple<string, Action>> switches = new List<Tuple<string, Action>>();
-
         private readonly List<NamedArgument> named = new List<NamedArgument>();
+        private readonly List<UnnamedArgument> unnamed = new List<UnnamedArgument>();
+        private readonly List<Switch> switches = new List<Switch>();
 
         private NamedArgument current;
 
@@ -35,16 +34,16 @@ namespace Appccelerate.CommandLineParser
             return new CommandLineParserConfigurator();
         }
 
-        public CommandLineParserConfigurator WithUnnamed(Action<string> action)
+        public CommandLineParserConfigurator WithUnnamed(Action<string> callback)
         {
-            this.unnamed.Add(action);
+            this.unnamed.Add(new UnnamedArgument(callback));
 
             return this;
         }
         
         public CommandLineParserConfigurator WithNamed(string name, Action<string> callback)
         {
-            NamedArgument namedArgument = new NamedArgument(name, callback);
+            var namedArgument = new NamedArgument(name, callback);
             this.named.Add(namedArgument);
 
             this.current = namedArgument;
@@ -52,16 +51,16 @@ namespace Appccelerate.CommandLineParser
             return this;
         }
 
-        public CommandLineParserConfigurator WithSwitch(string name, Action action)
+        public CommandLineParserConfigurator WithSwitch(string name, Action callback)
         {
-            this.switches.Add(new Tuple<string, Action>(name, action));
+            this.switches.Add(new Switch(name, callback));
 
             return this;
         }
 
         public CommandLineConfiguration BuildConfiguration()
         {
-            return new CommandLineConfiguration(this.unnamed, this.switches, this.named);
+            return new CommandLineConfiguration(this.named, this.unnamed, this.switches);
         }
 
         public CommandLineParserConfigurator Required()

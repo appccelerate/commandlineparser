@@ -43,11 +43,11 @@ namespace Appccelerate.CommandLineParser
                 {
                     string name = arg.Substring(1, arg.Length - 1);
 
-                    Tuple<string, Action> @switch = this.configuration.Switches.SingleOrDefault(s => s.Item1 == name);
+                    Switch @switch = this.configuration.Switches.SingleOrDefault(s => s.Name == name);
 
                     if (@switch != null)
                     {
-                        @switch.Item2();
+                        @switch.Callback();
                     }
                     else
                     {
@@ -68,7 +68,7 @@ namespace Appccelerate.CommandLineParser
                 {
                     if (wievielUnnamedMerSchoGhaHänd < this.configuration.Unnamed.Count())
                     {
-                        this.configuration.Unnamed.ElementAt(wievielUnnamedMerSchoGhaHänd++)(arg);
+                        this.configuration.Unnamed.ElementAt(wievielUnnamedMerSchoGhaHänd++).Callback(arg);
                     }
                     else
                     {

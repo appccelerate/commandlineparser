@@ -44,7 +44,7 @@ namespace Appccelerate.CommandLineParser.Facts
 
             result.Unnamed.Should().HaveCount(1);
             
-            result.Unnamed.Single()("a");
+            result.Unnamed.Single().Callback("a");
 
             parsedArgument.Should().Be("a"); // UGLY!
         }
@@ -77,8 +77,8 @@ namespace Appccelerate.CommandLineParser.Facts
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
             result.Switches.Should().HaveCount(1);
-            result.Switches.Single().Item1.Should().Be("switch");
-            result.Switches.Single().Item2();
+            result.Switches.Single().Name.Should().Be("switch");
+            result.Switches.Single().Callback();
             executed.Should().BeTrue();
         }
 

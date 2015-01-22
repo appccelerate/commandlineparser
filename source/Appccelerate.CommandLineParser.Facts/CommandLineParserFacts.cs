@@ -36,14 +36,11 @@ namespace Appccelerate.CommandLineParser.Facts
 
             var parsedArguments = new string[2];
 
-            var configuration = new CommandLineConfiguration(
-                new Action<string>[]
-                    { 
-                        x => parsedArguments[0] = x,
-                        x => parsedArguments[1] = x
-                    }, 
-                    null,
-                    Enumerable.Empty<NamedArgument>());
+            var configuration = new CommandLineConfiguration(Enumerable.Empty<NamedArgument>(), new[]
+                                                                                                    { 
+                                                                                                        new UnnamedArgument(x => parsedArguments[0] = x),
+                                                                                                        new UnnamedArgument(x => parsedArguments[1] = x)
+                                                                                                    }, Enumerable.Empty<Switch>());
             var testee = new CommandLineParser(configuration);
             
             testee.Parse(new[] { FirstArgument, SecondArgument });
@@ -66,10 +63,7 @@ namespace Appccelerate.CommandLineParser.Facts
                                      new NamedArgument(FirstName, x => parsedArguments[0] = x), 
                                      new NamedArgument(SecondName, x => parsedArguments[1] = x)
                                  };
-            var configuration = new CommandLineConfiguration(
-                null,
-                Enumerable.Empty<Tuple<string, Action>>(),
-                namedArguments);
+            var configuration = new CommandLineConfiguration(namedArguments, Enumerable.Empty<UnnamedArgument>(), Enumerable.Empty<Switch>());
             var testee = new CommandLineParser(configuration);
 
             testee.Parse(new[] { "-" + FirstName, FirstValue, "-" + SecondName, SecondValue });
@@ -84,14 +78,11 @@ namespace Appccelerate.CommandLineParser.Facts
             bool assigned2 = false;
             var switches = new[]
                                    {
-                                       new Tuple<string, Action>("switch", () => assigned = true),
-                                       new Tuple<string, Action>("switch2", () => { }),
-                                       new Tuple<string, Action>("switchReloaded", () => assigned2 = true)
+                                       new Switch("switch", () => assigned = true),
+                                       new Switch("switch2", () => { }),
+                                       new Switch("switchReloaded", () => assigned2 = true)
                                    };
-            var configuration = new CommandLineConfiguration(
-                null,
-                switches,
-                Enumerable.Empty<NamedArgument>());
+            var configuration = new CommandLineConfiguration(Enumerable.Empty<NamedArgument>(), Enumerable.Empty<UnnamedArgument>(), switches);
             var testee = new CommandLineParser(configuration);
 
             testee.Parse(new[] { "-switch", "-switchReloaded" });
@@ -103,10 +94,7 @@ namespace Appccelerate.CommandLineParser.Facts
         [Fact]
         public void Fails_WhenRequiredArgumentIsMissing()
         {
-            var configuration = new CommandLineConfiguration(
-            Enumerable.Empty<Action<string>>(),
-            Enumerable.Empty<Tuple<string, Action>>(),
-            new[] { new NamedArgument("name", v => { }) { Required = true } });
+            var configuration = new CommandLineConfiguration(new[] { new NamedArgument("name", v => { }) { Required = true } }, Enumerable.Empty<UnnamedArgument>(), Enumerable.Empty<Switch>());
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new string[] { });
@@ -117,10 +105,7 @@ namespace Appccelerate.CommandLineParser.Facts
         [Fact]
         public void Fails_WhenTooManyUnnamedArguments()
         {
-            var configuration = new CommandLineConfiguration(
-                Enumerable.Empty<Action<string>>(),
-                Enumerable.Empty<Tuple<string, Action>>(),
-                Enumerable.Empty<NamedArgument>());
+            var configuration = new CommandLineConfiguration(Enumerable.Empty<NamedArgument>(), Enumerable.Empty<UnnamedArgument>(), Enumerable.Empty<Switch>());
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new[] { "unknown" });
@@ -131,10 +116,7 @@ namespace Appccelerate.CommandLineParser.Facts
         [Fact]
         public void Fails_WhenUnknownNamedArgument()
         {
-            var configuration = new CommandLineConfiguration(
-                Enumerable.Empty<Action<string>>(), 
-                Enumerable.Empty<Tuple<string, Action>>(),
-                Enumerable.Empty<NamedArgument>());
+            var configuration = new CommandLineConfiguration(Enumerable.Empty<NamedArgument>(), Enumerable.Empty<UnnamedArgument>(), Enumerable.Empty<Switch>());
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new[] { "-unknown", "value" });
@@ -145,10 +127,7 @@ namespace Appccelerate.CommandLineParser.Facts
         [Fact]
         public void Fails_WhenUnknownSwitch()
         {
-            var configuration = new CommandLineConfiguration(
-                Enumerable.Empty<Action<string>>(),
-                Enumerable.Empty<Tuple<string, Action>>(),
-                Enumerable.Empty<NamedArgument>());
+            var configuration = new CommandLineConfiguration(Enumerable.Empty<NamedArgument>(), Enumerable.Empty<UnnamedArgument>(), Enumerable.Empty<Switch>());
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new[] { "-unknown" });
@@ -159,10 +138,7 @@ namespace Appccelerate.CommandLineParser.Facts
         [Fact]
         public void Fails_WhenNamedArgumentHasNoValue()
         {
-            var configuration = new CommandLineConfiguration(
-                Enumerable.Empty<Action<string>>(),
-                Enumerable.Empty<Tuple<string, Action>>(),
-                new[] { new NamedArgument("known", s => { }) });
+            var configuration = new CommandLineConfiguration(new[] { new NamedArgument("known", s => { }) }, Enumerable.Empty<UnnamedArgument>(), Enumerable.Empty<Switch>());
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new[] { "-known" });
