@@ -36,22 +36,21 @@ namespace Appccelerate.CommandLineParser.Facts
         [Fact]
         public void BuildsUnnamedArguments()
         {
+            const string Value = "value";
+
             string parsedArgument = null;
 
             this.testee.WithUnnamed(x => parsedArgument = x);
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            result.Unnamed.Should().HaveCount(1);
-            
-            result.Unnamed.Single().Callback("a");
-
-            parsedArgument.Should().Be("a"); // UGLY!
+            result.Should().HaveUnnamed(Value, () => parsedArgument == Value);
         }
 
         [Fact]
         public void BuildsNamedArguments()
         {
+            const string Value = "value";
             const string Name = "name";
             string parsedArgument = null;
 
@@ -59,27 +58,19 @@ namespace Appccelerate.CommandLineParser.Facts
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            result.Named.Should().HaveCount(1);
-
-            result.Named.Single().Callback("a");
-
-            parsedArgument.Should().Be("a"); // UGLY!
-
-            result.Named.Single().Name.Should().Be(Name);
+            result.Should().HaveNamed(Name, Value, () => parsedArgument == Value);
         }
 
         [Fact]
         public void BuildsSwitches()
         {
             bool executed = false;
-            this.testee.WithSwitch("switch", () => { executed = true; });
+            const string Name = "switch";
+            this.testee.WithSwitch(Name, () => { executed = true; });
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            result.Switches.Should().HaveCount(1);
-            result.Switches.Single().Name.Should().Be("switch");
-            result.Switches.Single().Callback();
-            executed.Should().BeTrue();
+            result.Should().HaveSwitch(Name, () => executed);
         }
 
         [Fact]
@@ -93,9 +84,7 @@ namespace Appccelerate.CommandLineParser.Facts
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            result.Named.Should().HaveCount(1);
-
-            result.Named.Single().Required.Should().BeTrue();
+            result.Required.OfType<NamedArgument>().Should().Contain(x => x.Name == Name);
         }
 
         [Fact]
@@ -107,9 +96,7 @@ namespace Appccelerate.CommandLineParser.Facts
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            result.Unnamed.Should().HaveCount(1);
-
-            result.Unnamed.Single().Required.Should().BeTrue();
+            result.Required.OfType<UnnamedArgument>().Should().NotBeEmpty();
         }
     }
 }

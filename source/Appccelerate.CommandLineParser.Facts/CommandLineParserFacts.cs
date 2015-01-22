@@ -97,7 +97,13 @@ namespace Appccelerate.CommandLineParser.Facts
         [Fact]
         public void Fails_WhenRequiredNamedArgumentIsMissing()
         {
-            var configuration = new CommandLineConfiguration(new[] { new NamedArgument("name", v => { }) { Required = true } }, Enumerable.Empty<UnnamedArgument>(), Enumerable.Empty<Switch>());
+            var namedArgument = new NamedArgument("name", v => { });
+
+            var configuration = new CommandLineConfiguration(
+                new[] { namedArgument }, 
+                Enumerable.Empty<UnnamedArgument>(), 
+                Enumerable.Empty<Switch>(),
+                new[] { namedArgument });
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new string[] { });
@@ -106,17 +112,54 @@ namespace Appccelerate.CommandLineParser.Facts
         }
 
         [Fact]
+        public void Succeeds_WhenRequiredNamedArgumentsArePresent()
+        {
+            var namedArgument = new NamedArgument("name", v => { });
+
+            var configuration = new CommandLineConfiguration(
+                new[] { namedArgument },
+                Enumerable.Empty<UnnamedArgument>(),
+                Enumerable.Empty<Switch>(),
+                new[] { namedArgument });
+            var testee = new CommandLineParser(configuration);
+
+            var result = testee.Parse(new[] { "-name", "value" });
+
+            result.Succeeded.Should().BeTrue();
+        }
+
+        [Fact]
         public void Fails_WhenRequiredUnnamedArgumentIsMissing()
         {
+            var unnamedArgument = new UnnamedArgument(v => { });
+
             var configuration = new CommandLineConfiguration(
                 Enumerable.Empty<NamedArgument>(),
-                new[] { new UnnamedArgument(v => { }) { Required = true } },
-                Enumerable.Empty<Switch>());
+                new[] { unnamedArgument },
+                Enumerable.Empty<Switch>(),
+                new[] { unnamedArgument });
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new string[] { });
 
             result.Succeeded.Should().BeFalse();
+        }
+
+        [Fact]
+        public void Succeeds_WhenRequiredUnnamedArgumentsArePresent()
+        {
+            var unnamedArgument = new UnnamedArgument(v => { });
+
+            var configuration = new CommandLineConfiguration(
+                Enumerable.Empty<NamedArgument>(),
+                new[] { unnamedArgument },
+                Enumerable.Empty<Switch>(),
+                new[] { unnamedArgument });
+            var testee = new CommandLineParser(configuration);
+
+            var result = testee.Parse(new[] { "value" });
+
+            result.Succeeded.Should().BeTrue();
         }
 
         [Fact]

@@ -26,6 +26,7 @@ namespace Appccelerate.CommandLineParser
         private readonly List<NamedArgument> named = new List<NamedArgument>();
         private readonly List<UnnamedArgument> unnamed = new List<UnnamedArgument>();
         private readonly List<Switch> switches = new List<Switch>();
+        private readonly List<Argument> required = new List<Argument>();
 
         private Argument current;
 
@@ -63,12 +64,12 @@ namespace Appccelerate.CommandLineParser
 
         public CommandLineConfiguration BuildConfiguration()
         {
-            return new CommandLineConfiguration(this.named, this.unnamed, this.switches);
+            return new CommandLineConfiguration(this.named, this.unnamed, this.switches, this.required);
         }
 
         public CommandLineParserConfigurator Required()
         {
-            this.current.Required = true;
+            this.required.Add(this.current);
 
             return this;
         }

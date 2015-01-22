@@ -19,17 +19,20 @@
 namespace Appccelerate.CommandLineParser
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     public class CommandLineConfiguration
     {
         public CommandLineConfiguration(
             IEnumerable<NamedArgument> named,
             IEnumerable<UnnamedArgument> unnamed,
-            IEnumerable<Switch> switches)
+            IEnumerable<Switch> switches,
+            IEnumerable<Argument> required = null)
         {
             this.Named = named;
             this.Unnamed = unnamed;
             this.Switches = switches;
+            this.Required = required ?? Enumerable.Empty<Argument>();
         }
 
         public IEnumerable<NamedArgument> Named { get; set; }
@@ -37,5 +40,7 @@ namespace Appccelerate.CommandLineParser
         public IEnumerable<UnnamedArgument> Unnamed { get; private set; }
 
         public IEnumerable<Switch> Switches { get; private set; }
+
+        public IEnumerable<Argument> Required { get; private set; }
     }
 }

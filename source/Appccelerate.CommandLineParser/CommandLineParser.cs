@@ -19,6 +19,7 @@
 namespace Appccelerate.CommandLineParser
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     public class CommandLineParser : ICommandLineParser
@@ -33,6 +34,8 @@ namespace Appccelerate.CommandLineParser
         public ParseResult Parse(string[] args)
         {
             bool failed = false;
+
+            var required = new List<Argument>(this.configuration.Required);
             
             int numberOfParsedUnnamed = 0;
             for (int i = 0; i < args.Length; i++)
@@ -56,7 +59,8 @@ namespace Appccelerate.CommandLineParser
                         if (named != null && i < args.Length - 1)
                         {
                             named.Callback(args[++i]);
-                            named.Required = false;
+                            
+                            required.Remove(named);
                         }
                         else
                         {
@@ -70,7 +74,8 @@ namespace Appccelerate.CommandLineParser
                     {
                         UnnamedArgument unnamedArgument = this.configuration.Unnamed.ElementAt(numberOfParsedUnnamed++);
                         unnamedArgument.Callback(arg);
-                        unnamedArgument.Required = false;
+                        
+                        required.Remove(unnamedArgument);
                     }
                     else
                     {
@@ -79,7 +84,7 @@ namespace Appccelerate.CommandLineParser
                 }
             }
 
-            if (this.configuration.Named.Any(n => n.Required) || this.configuration.Unnamed.Any(u => u.Required))
+            if (required.Any())
             {
                 failed = true;
             }
