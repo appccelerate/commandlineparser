@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UnnamedArgument.cs" company="Appccelerate">
+// <copyright file="Argument.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,15 +18,8 @@
 
 namespace Appccelerate.CommandLineParser
 {
-    using System;
-
-    public class UnnamedArgument : Argument
+    public class Argument
     {
-        public UnnamedArgument(Action<string> callback)
-        {
-            this.Callback = callback;
-        }
-        
-        public Action<string> Callback { get; private set; }
+        public bool Required { get; set; }
     }
 }

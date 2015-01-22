@@ -27,7 +27,7 @@ namespace Appccelerate.CommandLineParser
         private readonly List<UnnamedArgument> unnamed = new List<UnnamedArgument>();
         private readonly List<Switch> switches = new List<Switch>();
 
-        private NamedArgument current;
+        private Argument current;
 
         public static CommandLineParserConfigurator Create()
         {
@@ -36,7 +36,10 @@ namespace Appccelerate.CommandLineParser
 
         public CommandLineParserConfigurator WithUnnamed(Action<string> callback)
         {
-            this.unnamed.Add(new UnnamedArgument(callback));
+            var unnamedArgument = new UnnamedArgument(callback);
+            this.unnamed.Add(unnamedArgument);
+
+            this.current = unnamedArgument;
 
             return this;
         }

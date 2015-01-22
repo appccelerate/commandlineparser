@@ -18,7 +18,6 @@
 
 namespace Appccelerate.CommandLineParser.Facts
 {
-    using System;
     using System.Linq;
 
     using FluentAssertions;
@@ -36,13 +35,17 @@ namespace Appccelerate.CommandLineParser.Facts
 
             var parsedArguments = new string[2];
 
-            var configuration = new CommandLineConfiguration(Enumerable.Empty<NamedArgument>(), new[]
-                                                                                                    { 
-                                                                                                        new UnnamedArgument(x => parsedArguments[0] = x),
-                                                                                                        new UnnamedArgument(x => parsedArguments[1] = x)
-                                                                                                    }, Enumerable.Empty<Switch>());
+            var unnamedArguments = new[]
+                                       { 
+                                           new UnnamedArgument(x => parsedArguments[0] = x),
+                                           new UnnamedArgument(x => parsedArguments[1] = x)
+                                       };
+            var configuration = new CommandLineConfiguration(
+                Enumerable.Empty<NamedArgument>(), 
+                unnamedArguments, 
+                Enumerable.Empty<Switch>());
             var testee = new CommandLineParser(configuration);
-            
+
             testee.Parse(new[] { FirstArgument, SecondArgument });
 
             parsedArguments.Should().Equal(FirstArgument, SecondArgument);
@@ -92,9 +95,23 @@ namespace Appccelerate.CommandLineParser.Facts
         }
 
         [Fact]
-        public void Fails_WhenRequiredArgumentIsMissing()
+        public void Fails_WhenRequiredNamedArgumentIsMissing()
         {
             var configuration = new CommandLineConfiguration(new[] { new NamedArgument("name", v => { }) { Required = true } }, Enumerable.Empty<UnnamedArgument>(), Enumerable.Empty<Switch>());
+            var testee = new CommandLineParser(configuration);
+
+            var result = testee.Parse(new string[] { });
+
+            result.Succeeded.Should().BeFalse();
+        }
+
+        [Fact]
+        public void Fails_WhenRequiredUnnamedArgumentIsMissing()
+        {
+            var configuration = new CommandLineConfiguration(
+                Enumerable.Empty<NamedArgument>(),
+                new[] { new UnnamedArgument(v => { }) { Required = true } },
+                Enumerable.Empty<Switch>());
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new string[] { });

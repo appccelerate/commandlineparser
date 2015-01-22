@@ -39,6 +39,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Argument.cs" />
     <Compile Include="CommandLineConfiguration.cs" />
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="CommandLineParserConfigurator.cs" />

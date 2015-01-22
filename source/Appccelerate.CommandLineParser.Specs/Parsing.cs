@@ -133,7 +133,7 @@ namespace Appccelerate.CommandLineParser.Specs
         }
 
         [Scenario]
-        public void Required(
+        public void RequiredNamed(
             string[] args,
             string firstParsedArgument,
             string secondParsedArgument,
@@ -157,6 +157,43 @@ namespace Appccelerate.CommandLineParser.Specs
                 parser = CommandLineParserConfigurator
                     .Create()
                     .WithNamed(RequiredName, v => { })
+                        .Required()
+                    .WithNamed(FirstName, v => { })
+                    .WithNamed(SecondName, v => { })
+                    .BuildParser();
+            });
+
+            "when parsing"._(() =>
+                result = parser.Parse(args));
+
+            "should return parsing failure"._(() =>
+                result.Succeeded.Should().BeFalse());
+        }
+
+        [Scenario]
+        public void RequiredUnnamed(
+            string[] args,
+            string firstParsedArgument,
+            string secondParsedArgument,
+            ICommandLineParser parser,
+            ParseResult result)
+        {
+            const string FirstName = "firstName";
+            const string FirstValue = "firstValue";
+            const string SecondName = "secondName";
+            const string SecondValue = "secondValue";
+
+            "establish some arguments with missing required argument"._(() =>
+                args = new[]
+                           {
+                               "-" + FirstName, FirstValue, "-" + SecondName, SecondValue
+                           });
+
+            "establish a parsing configuration with required "._(() =>
+            {
+                parser = CommandLineParserConfigurator
+                    .Create()
+                    .WithUnnamed(v => { })
                         .Required()
                     .WithNamed(FirstName, v => { })
                     .WithNamed(SecondName, v => { })

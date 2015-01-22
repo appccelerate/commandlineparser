@@ -20,7 +20,7 @@ namespace Appccelerate.CommandLineParser
 {
     using System;
 
-    public class NamedArgument
+    public class NamedArgument : Argument
     {
         public NamedArgument(string name, Action<string> callback)
         {
@@ -31,7 +31,5 @@ namespace Appccelerate.CommandLineParser
         public string Name { get; private set; }
 
         public Action<string> Callback { get; private set; }
-
-        public bool Required { get; set; }
     }
 }

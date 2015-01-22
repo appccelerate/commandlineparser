@@ -34,7 +34,7 @@ namespace Appccelerate.CommandLineParser
         {
             bool failed = false;
             
-            int wievielUnnamedMerSchoGhaHänd = 0;
+            int numberOfParsedUnnamed = 0;
             for (int i = 0; i < args.Length; i++)
             {
                 string arg = args.ElementAt(i);
@@ -66,9 +66,11 @@ namespace Appccelerate.CommandLineParser
                 }
                 else
                 {
-                    if (wievielUnnamedMerSchoGhaHänd < this.configuration.Unnamed.Count())
+                    if (numberOfParsedUnnamed < this.configuration.Unnamed.Count())
                     {
-                        this.configuration.Unnamed.ElementAt(wievielUnnamedMerSchoGhaHänd++).Callback(arg);
+                        UnnamedArgument unnamedArgument = this.configuration.Unnamed.ElementAt(numberOfParsedUnnamed++);
+                        unnamedArgument.Callback(arg);
+                        unnamedArgument.Required = false;
                     }
                     else
                     {
@@ -77,7 +79,7 @@ namespace Appccelerate.CommandLineParser
                 }
             }
 
-            if (this.configuration.Named.Any(n => n.Required))
+            if (this.configuration.Named.Any(n => n.Required) || this.configuration.Unnamed.Any(u => u.Required))
             {
                 failed = true;
             }

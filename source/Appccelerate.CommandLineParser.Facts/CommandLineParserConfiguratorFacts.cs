@@ -97,5 +97,19 @@ namespace Appccelerate.CommandLineParser.Facts
 
             result.Named.Single().Required.Should().BeTrue();
         }
+
+        [Fact]
+        public void BuildsRequiredUnnamedArguments()
+        {
+            this.testee
+                .WithUnnamed(x => { })
+                    .Required();
+
+            CommandLineConfiguration result = this.testee.BuildConfiguration();
+
+            result.Unnamed.Should().HaveCount(1);
+
+            result.Unnamed.Single().Required.Should().BeTrue();
+        }
     }
 }
