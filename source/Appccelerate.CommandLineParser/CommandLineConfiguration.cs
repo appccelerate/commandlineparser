@@ -24,15 +24,17 @@ namespace Appccelerate.CommandLineParser
     public class CommandLineConfiguration
     {
         public CommandLineConfiguration(
-            IEnumerable<NamedArgument> named,
-            IEnumerable<UnnamedArgument> unnamed,
-            IEnumerable<Switch> switches,
-            IEnumerable<Argument> required = null)
+            IEnumerable<NamedArgument> named, 
+            IEnumerable<UnnamedArgument> unnamed, 
+            IEnumerable<Switch> switches, 
+            IEnumerable<Argument> required = null, 
+            IDictionary<string, Argument> longAliases = null)
         {
             this.Named = named;
             this.Unnamed = unnamed;
             this.Switches = switches;
             this.Required = required ?? Enumerable.Empty<Argument>();
+            this.LongAliases = longAliases ?? new Dictionary<string, Argument>();
         }
 
         public IEnumerable<NamedArgument> Named { get; set; }
@@ -42,5 +44,7 @@ namespace Appccelerate.CommandLineParser
         public IEnumerable<Switch> Switches { get; private set; }
 
         public IEnumerable<Argument> Required { get; private set; }
+
+        public IDictionary<string, Argument> LongAliases { get; set; }
     }
 }

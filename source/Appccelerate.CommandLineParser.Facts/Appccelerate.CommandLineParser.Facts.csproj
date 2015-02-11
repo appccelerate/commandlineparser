@@ -7,7 +7,7 @@
     <ProjectGuid>{13492172-10F5-46E9-8421-23C177413D79}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Appccelerate.CommandLineParser.Facts</RootNamespace>
+    <RootNamespace>Appccelerate.CommandLineParser</RootNamespace>
     <AssemblyName>Appccelerate.CommandLineParser.Facts</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

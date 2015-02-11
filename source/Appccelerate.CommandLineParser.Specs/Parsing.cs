@@ -124,7 +124,7 @@ namespace Appccelerate.CommandLineParser.Specs
             "when parsing"._(() =>
                 parser.Parse(args));
 
-            "should parse unnamed argument"._(() =>
+            "should parse switch"._(() =>
                 new object[]
                     {
                         firstParsedSwitch, secondParsedSwitch
@@ -208,7 +208,82 @@ namespace Appccelerate.CommandLineParser.Specs
         }
 
         [Scenario]
-        public void SuperTestFall(
+        public void SupportsLongAliasForNamed(
+            string[] args,
+            string nameParsedArgument,
+            string longAliasParsedArgument,
+            ICommandLineParser parser)
+        {
+            const string Name = "s";
+            const string ShortValue = "short";
+            const string LongAlias = "long";
+            const string LongAliasValue = "long";
+
+            "establish named arguments with long alias"._(() =>
+                args = new[]
+                           {
+                               "-" + Name, ShortValue, "--" + LongAlias, LongAliasValue
+                           });
+
+            "establish a parsing configuration"._(() =>
+            {
+                parser = CommandLineParserConfigurator
+                    .Create()
+                        .WithNamed(Name, v => nameParsedArgument = v)
+                            .HavingLongAlias("_")
+                        .WithNamed("_", v => longAliasParsedArgument = v)
+                            .HavingLongAlias(LongAlias)
+                    .BuildParser();
+            });
+
+            "when parsing"._(() =>
+                parser.Parse(args));
+
+            "should parse named arguments"._(() =>
+                new[]
+                    {
+                        nameParsedArgument, longAliasParsedArgument
+                    }
+                    .Should().Equal(ShortValue, LongAliasValue));
+        }
+
+        [Scenario]
+        public void SupportsLongAliasForSwitch(
+            string[] args,
+            bool firstParsedSwitch,
+            string secondParsedSwitch,
+            ICommandLineParser parser)
+        {
+            "establish arguments with switch with long alias"._(() =>
+                args = new[]
+                           {
+                               "-f", "--secondSwitch"
+                           });
+
+            "establish a parsing configuration for switches"._(() =>
+            {
+                parser = CommandLineParserConfigurator
+                    .Create()
+                    .WithSwitch("f", () => firstParsedSwitch = true)
+                        .HavingLongAlias("firstSwitch")
+                    .WithSwitch("s", () => secondParsedSwitch = "yeah")
+                        .HavingLongAlias("secondSwitch")
+                    .BuildParser();
+            });
+
+            "when parsing"._(() =>
+                parser.Parse(args));
+
+            "should parse switch"._(() =>
+                new object[]
+                    {
+                        firstParsedSwitch, secondParsedSwitch
+                    }
+                    .Should().Equal(true, "yeah"));
+        }
+
+        [Scenario]
+        public void RealWorldScenario(
             string[] args,
             bool firstParsedSwitch,
             string secondParsedSwitch,

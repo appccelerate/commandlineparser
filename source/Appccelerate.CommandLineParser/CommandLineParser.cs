@@ -33,63 +33,120 @@ namespace Appccelerate.CommandLineParser
 
         public ParseResult Parse(string[] args)
         {
-            bool failed = false;
-
-            var required = new List<Argument>(this.configuration.Required);
-            
-            int numberOfParsedUnnamed = 0;
-            for (int i = 0; i < args.Length; i++)
+            try
             {
-                string arg = args.ElementAt(i);
+                var required = new List<Argument>(this.configuration.Required);
 
-                if (arg.StartsWith("-"))
+                int numberOfParsedUnnamed = 0;
+                for (int i = 0; i < args.Length; i++)
                 {
-                    string name = arg.Substring(1, arg.Length - 1);
+                    string arg = args.ElementAt(i);
 
-                    Switch @switch = this.configuration.Switches.SingleOrDefault(s => s.Name == name);
-
-                    if (@switch != null)
+                    if (arg.StartsWith("--"))
                     {
-                        @switch.Callback();
-                    }
-                    else
-                    {
-                        NamedArgument named = this.configuration.Named.SingleOrDefault(n => n.Name == name);
+                        string longAlias = arg.Substring(2, arg.Length - 2);
 
-                        if (named != null && i < args.Length - 1)
+                        if (!this.configuration.LongAliases.ContainsKey(longAlias))
                         {
-                            named.Callback(args[++i]);
+                            throw new ParseException(Errors.UnknownArgument(longAlias));
+                        }
+
+                        Argument argument = this.configuration.LongAliases[longAlias];
+
+                        NamedArgument namedArgument = argument as NamedArgument;
+                        if (namedArgument != null)
+                        {
+                            if (i >= args.Length - 1)
+                            {
+                                throw new ParseException(Errors.NamedArgumentValueIsMissing(longAlias));
+                            }
                             
-                            required.Remove(named);
+                            namedArgument.Callback(args[++i]);
+
+                            required.Remove(namedArgument);
+                        }
+
+                        Switch @switch = argument as Switch;
+                        if (@switch != null)
+                        {
+                            @switch.Callback();
+                        }
+                    }
+
+                    if (arg.StartsWith("-"))
+                    {
+                        string name = arg.Substring(1, arg.Length - 1);
+
+                        Switch @switch = this.configuration.Switches.SingleOrDefault(s => s.Name == name);
+
+                        if (@switch != null)
+                        {
+                            @switch.Callback();
                         }
                         else
                         {
-                            failed = true;
+                            NamedArgument named = this.configuration.Named.SingleOrDefault(n => n.Name == name);
+
+                            if (named == null)
+                            {
+                                throw new ParseException(Errors.UnknownArgument(name));
+                            }
+
+                            if (i >= args.Length - 1)
+                            {
+                                throw new ParseException(Errors.NamedArgumentValueIsMissing(name));
+                            }
+                            
+                            named.Callback(args[++i]);
+
+                            required.Remove(named);
                         }
-                    }
-                }
-                else
-                {
-                    if (numberOfParsedUnnamed < this.configuration.Unnamed.Count())
-                    {
-                        UnnamedArgument unnamedArgument = this.configuration.Unnamed.ElementAt(numberOfParsedUnnamed++);
-                        unnamedArgument.Callback(arg);
-                        
-                        required.Remove(unnamedArgument);
                     }
                     else
                     {
-                        failed = true;
+                        if (numberOfParsedUnnamed < this.configuration.Unnamed.Count())
+                        {
+                            UnnamedArgument unnamedArgument = this.configuration.Unnamed.ElementAt(numberOfParsedUnnamed++);
+                            unnamedArgument.Callback(arg);
+
+                            required.Remove(unnamedArgument);
+                        }
+                        else
+                        {
+                            throw new ParseException(Errors.TooManyUnnamedArguments);
+                        }
                     }
                 }
-            }
 
-            if (required.Any())
+                if (required.Any())
+                {
+                    var named = required.First() as NamedArgument;
+                    if (named != null)
+                    {
+                        throw new ParseException(Errors.RequiredNamedArgumentIsMissing(named.Name));
+                    }
+                    
+                    throw new ParseException(Errors.RequiredUnnamedArgumentIsMissing);
+                }
+
+                return new ParseResult(true, null);
+            }
+            catch (ParseException exception)
             {
-                failed = true;
+                return new ParseResult(false, exception.Message);
+            }
+        }
+
+        public class ParseException : Exception
+        {
+            public ParseException()
+            {
             }
 
-            return new ParseResult(!failed);
+            public ParseException(string message)
+                : base(message)
+            {
+            }
         }
     }
 }

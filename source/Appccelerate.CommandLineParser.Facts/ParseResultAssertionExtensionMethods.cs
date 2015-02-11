@@ -16,7 +16,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser.Facts
+namespace Appccelerate.CommandLineParser
 {
     using System;
     using System.Linq;
@@ -47,7 +47,7 @@ namespace Appccelerate.CommandLineParser.Facts
             return new AndConstraint<CommandLineConfiguration>(subject);
         }
 
-        public static AndConstraint<CommandLineConfiguration> HaveNamed(this ObjectAssertions assertions, string name, string input, Func<bool> validation)
+        public static void HaveNamed(this ObjectAssertions assertions, string name, string input, Func<bool> validation)
         {
             var subject = assertions.Subject as CommandLineConfiguration;
 
@@ -60,13 +60,13 @@ namespace Appccelerate.CommandLineParser.Facts
                 .ForCondition(count == 1)
                 .FailWith("named argument `{0}` does exist `{1}` times, but was expected to exist exactly once.", name, count);
 
-            subject.Named.Single(n => n.Name == name).Callback(input);
+            NamedArgument namedArgument = subject.Named.Single(n => n.Name == name);
+
+            namedArgument.Callback(input);
 
             Execute.Assertion
                 .ForCondition(validation())
                 .FailWith("callback did not execute successfully");
-
-            return new AndConstraint<CommandLineConfiguration>(subject);
         }
 
         public static AndConstraint<CommandLineConfiguration> HaveSwitch(this ObjectAssertions assertions, string name, Func<bool> validation)

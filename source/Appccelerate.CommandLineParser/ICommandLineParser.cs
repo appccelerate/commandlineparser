@@ -25,11 +25,14 @@ namespace Appccelerate.CommandLineParser
 
     public class ParseResult
     {
-        public ParseResult(bool succeeded)
+        public ParseResult(bool succeeded, string message)
         {
             this.Succeeded = succeeded;
+            this.Message = message;
         }
 
         public bool Succeeded { get; private set; }
+
+        public string Message { get; private set; }
     }
 }

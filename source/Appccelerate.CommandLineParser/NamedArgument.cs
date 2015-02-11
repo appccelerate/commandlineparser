@@ -22,14 +22,14 @@ namespace Appccelerate.CommandLineParser
 
     public class NamedArgument : Argument
     {
-        public NamedArgument(string name, Action<string> callback)
+        public NamedArgument(string shortName, Action<string> callback)
         {
-            this.Name = name;
+            this.Name = shortName;
             this.Callback = callback;
         }
 
         public string Name { get; private set; }
-
+        
         public Action<string> Callback { get; private set; }
     }
 }

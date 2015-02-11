@@ -27,6 +27,7 @@ namespace Appccelerate.CommandLineParser
         private readonly List<UnnamedArgument> unnamed = new List<UnnamedArgument>();
         private readonly List<Switch> switches = new List<Switch>();
         private readonly List<Argument> required = new List<Argument>();
+        private readonly Dictionary<string, Argument> longAliases = new Dictionary<string, Argument>();
 
         private Argument current;
 
@@ -55,16 +56,32 @@ namespace Appccelerate.CommandLineParser
             return this;
         }
 
+        public CommandLineParserConfigurator HavingLongAlias(string longAlias)
+        {
+            this.longAliases.Add(longAlias, this.current);
+
+            return this;    
+        }
+
         public CommandLineParserConfigurator WithSwitch(string name, Action callback)
         {
-            this.switches.Add(new Switch(name, callback));
+            var argument = new Switch(name, callback);
+
+            this.switches.Add(argument);
+
+            this.current = argument;
 
             return this;
         }
 
         public CommandLineConfiguration BuildConfiguration()
         {
-            return new CommandLineConfiguration(this.named, this.unnamed, this.switches, this.required);
+            return new CommandLineConfiguration(
+                this.named, 
+                this.unnamed, 
+                this.switches, 
+                this.required,
+                this.longAliases);
         }
 
         public CommandLineParserConfigurator Required()

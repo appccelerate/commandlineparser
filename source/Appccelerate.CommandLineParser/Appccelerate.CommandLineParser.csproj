@@ -44,6 +44,7 @@
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="CommandLineParserConfigurator.cs" />
     <Compile Include="CommandLineParserExtensionMethods.cs" />
+    <Compile Include="Errors.cs" />
     <Compile Include="ICommandLineParser.cs" />
     <Compile Include="NamedArgument.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

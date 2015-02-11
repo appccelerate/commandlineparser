@@ -16,7 +16,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser.Facts
+namespace Appccelerate.CommandLineParser
 {
     using System.Linq;
 
@@ -62,6 +62,23 @@ namespace Appccelerate.CommandLineParser.Facts
         }
 
         [Fact]
+        public void BuildsNamedArgumentsWithLongAliases()
+        {
+            const string Name = "name";
+            const string LongAlias = "longAlias";
+            
+            this.testee.WithNamed(Name, x => { })
+                .HavingLongAlias(LongAlias);
+
+            CommandLineConfiguration result = this.testee.BuildConfiguration();
+
+            result.LongAliases
+                .Select(x => new { x.Key, Value = x.Value as NamedArgument })
+                .Select(x => new { x.Key, Name = x.Value != null ? x.Value.Name : null })
+                .Should().ContainSingle(x => x.Key == LongAlias && x.Name == Name);
+        }
+
+        [Fact]
         public void BuildsSwitches()
         {
             bool executed = false;
@@ -71,6 +88,23 @@ namespace Appccelerate.CommandLineParser.Facts
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
             result.Should().HaveSwitch(Name, () => executed);
+        }
+
+        [Fact]
+        public void BuildsSwitchesWithLongAliases()
+        {
+            const string Name = "switch";
+            const string LongAlias = "longAlias";
+
+            this.testee.WithSwitch(Name, () => { })
+                .HavingLongAlias(LongAlias);
+
+            CommandLineConfiguration result = this.testee.BuildConfiguration();
+
+            result.LongAliases
+                .Select(x => new { x.Key, Value = x.Value as Switch })
+                .Select(x => new { x.Key, Name = x.Value != null ? x.Value.Name : null })
+                .Should().ContainSingle(x => x.Key == LongAlias && x.Name == Name);
         }
 
         [Fact]
