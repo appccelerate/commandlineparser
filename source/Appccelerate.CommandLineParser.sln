@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{14AA37
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appccelerate.CommandLineParser.Sample", "Appccelerate.CommandLineParser.Sample\Appccelerate.CommandLineParser.Sample.csproj", "{F07F2977-28B8-4B6A-BA15-0A1A74D113CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{6850F033-4E02-4A1B-8C32-E37957300982}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6850F033-4E02-4A1B-8C32-E37957300982}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6850F033-4E02-4A1B-8C32-E37957300982}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F07F2977-28B8-4B6A-BA15-0A1A74D113CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F07F2977-28B8-4B6A-BA15-0A1A74D113CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F07F2977-28B8-4B6A-BA15-0A1A74D113CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F07F2977-28B8-4B6A-BA15-0A1A74D113CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
