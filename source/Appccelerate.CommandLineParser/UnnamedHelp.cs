@@ -1,5 +1,5 @@
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CommandLineParserExtensionMethods.cs" company="Appccelerate">
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="UnnamedHelp.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,12 +18,19 @@
 
 namespace Appccelerate.CommandLineParser
 {
-    public static class CommandLineParserExtensionMethods
+    public class UnnamedHelp : Help
     {
-        public static ICommandLineParser BuildParser(this IConfigurationSyntax configurator)
+        public UnnamedHelp()
+            : this("value", null)
         {
-            var configuration = configurator.BuildConfiguration();
-            return new CommandLineParser(configuration);
         }
+
+        public UnnamedHelp(string placeholder, string description)
+            : base(description)
+        {
+            this.Placeholder = placeholder;
+        }
+
+        public string Placeholder { get; private set; }
     }
 }

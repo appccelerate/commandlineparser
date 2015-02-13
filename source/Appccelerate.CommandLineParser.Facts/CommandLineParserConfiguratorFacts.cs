@@ -30,7 +30,7 @@ namespace Appccelerate.CommandLineParser
 
         public CommandLineParserConfiguratorFacts()
         {
-            this.testee = CommandLineParserConfigurator.Create();
+            this.testee = new CommandLineParserConfigurator();
         }
 
         [Fact]
@@ -131,6 +131,60 @@ namespace Appccelerate.CommandLineParser
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
             result.Required.OfType<UnnamedArgument>().Should().NotBeEmpty();
+        }
+
+        [Fact]
+        public void BuildsNamedArgumentsHelp()
+        {
+            const string Name = "name";
+            const string ValuePlaceholder = "value";
+            const string Description = "description";
+            this.testee
+                .WithNamed(Name, x => { })
+                    .DescribedBy(ValuePlaceholder, Description);
+
+            CommandLineConfiguration result = this.testee.BuildConfiguration();
+
+            var namedHelpEntries = result.Help.Where(x => x.Key is NamedArgument).ToList();
+            namedHelpEntries.Select(x => x.Value).OfType<NamedHelp>()
+                .Should().ContainSingle(x =>
+                    x.ValuePlaceholder == ValuePlaceholder &&
+                    x.Description == Description);
+        }
+
+        [Fact]
+        public void BuildsUnnamedArgumentsHelp()
+        {
+            const string Placeholder = "placeholder";
+            const string Description = "description";
+            this.testee
+                .WithUnnamed(x => { })
+                    .DescribedBy(Placeholder, Description);
+
+            CommandLineConfiguration result = this.testee.BuildConfiguration();
+
+            var unnamedHelpEntries = result.Help.Where(x => x.Key is UnnamedArgument).ToList();
+            unnamedHelpEntries.Select(x => x.Value).OfType<UnnamedHelp>()
+                .Should().ContainSingle(x =>
+                    x.Placeholder == Placeholder &&
+                    x.Description == Description);
+        }
+
+        [Fact]
+        public void BuildsSwitchHelp()
+        {
+            const string Name = "name";
+            const string Description = "description";
+            this.testee
+                .WithSwitch(Name, () => { })
+                    .DescribedBy(Description);
+
+            CommandLineConfiguration result = this.testee.BuildConfiguration();
+
+            var switchHelpEntries = result.Help.Where(x => x.Key is Switch).ToList();
+            switchHelpEntries.Select(x => x.Value).OfType<SwitchHelp>()
+                .Should().ContainSingle(x =>
+                    x.Description == Description);
         }
     }
 }

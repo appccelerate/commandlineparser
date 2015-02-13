@@ -21,22 +21,23 @@ namespace Appccelerate.CommandLineParser
     using System;
     using System.Collections.Generic;
 
-    public class CommandLineParserConfigurator
+    public class CommandLineParserConfigurator : INamedSyntax, IUnnamedSyntax, ISwitchSyntax
     {
         private readonly List<NamedArgument> named = new List<NamedArgument>();
         private readonly List<UnnamedArgument> unnamed = new List<UnnamedArgument>();
         private readonly List<Switch> switches = new List<Switch>();
         private readonly List<Argument> required = new List<Argument>();
         private readonly Dictionary<string, Argument> longAliases = new Dictionary<string, Argument>();
+        private readonly Dictionary<Argument, Help> help = new Dictionary<Argument, Help>();
 
         private Argument current;
 
-        public static CommandLineParserConfigurator Create()
+        public static IConfigurationSyntax Create()
         {
             return new CommandLineParserConfigurator();
         }
 
-        public CommandLineParserConfigurator WithUnnamed(Action<string> callback)
+        public IUnnamedSyntax WithUnnamed(Action<string> callback)
         {
             var unnamedArgument = new UnnamedArgument(callback);
             this.unnamed.Add(unnamedArgument);
@@ -46,7 +47,7 @@ namespace Appccelerate.CommandLineParser
             return this;
         }
         
-        public CommandLineParserConfigurator WithNamed(string name, Action<string> callback)
+        public INamedSyntax WithNamed(string name, Action<string> callback)
         {
             var namedArgument = new NamedArgument(name, callback);
             this.named.Add(namedArgument);
@@ -56,14 +57,17 @@ namespace Appccelerate.CommandLineParser
             return this;
         }
 
-        public CommandLineParserConfigurator HavingLongAlias(string longAlias)
+        INamedSyntax INamedSyntax.HavingLongAlias(string longAlias)
         {
-            this.longAliases.Add(longAlias, this.current);
-
-            return this;    
+            return this.AddLongAlias(longAlias);
         }
 
-        public CommandLineParserConfigurator WithSwitch(string name, Action callback)
+        ISwitchSyntax ISwitchSyntax.HavingLongAlias(string longAlias)
+        {
+            return this.AddLongAlias(longAlias);
+        }
+
+        public ISwitchSyntax WithSwitch(string name, Action callback)
         {
             var argument = new Switch(name, callback);
 
@@ -81,14 +85,88 @@ namespace Appccelerate.CommandLineParser
                 this.unnamed, 
                 this.switches, 
                 this.required,
-                this.longAliases);
+                this.longAliases,
+                this.help);
         }
 
-        public CommandLineParserConfigurator Required()
+        INamedSyntax INamedSyntax.Required()
+        {
+            return this.AddCurrentToRequired();
+        }
+
+        IUnnamedSyntax IUnnamedSyntax.Required()
+        {
+            return this.AddCurrentToRequired();
+        }
+
+        INamedSyntax INamedSyntax.DescribedBy(string placeholder, string text)
+        {
+            return this.AddHelp(new NamedHelp(placeholder, text));
+        }
+
+        IUnnamedSyntax IUnnamedSyntax.DescribedBy(string placeholder, string text)
+        {
+            return this.AddHelp(new UnnamedHelp(placeholder, text));
+        }
+
+        IConfigurationSyntax ISwitchSyntax.DescribedBy(string text)
+        {
+            return this.AddHelp(new SwitchHelp(text));
+        }
+
+        private CommandLineParserConfigurator AddLongAlias(string longAlias)
+        {
+            this.longAliases.Add(longAlias, this.current);
+
+            return this;
+        }
+
+        private CommandLineParserConfigurator AddHelp(Help switchHelp)
+        {
+            this.help.Add(this.current, switchHelp);
+
+            return this;
+        }
+
+        private CommandLineParserConfigurator AddCurrentToRequired()
         {
             this.required.Add(this.current);
 
             return this;
         }
+    }
+
+    public interface IConfigurationSyntax
+    {
+        IUnnamedSyntax WithUnnamed(Action<string> callback);
+
+        INamedSyntax WithNamed(string name, Action<string> callback);
+
+        ISwitchSyntax WithSwitch(string name, Action callback);
+
+        CommandLineConfiguration BuildConfiguration();
+    }
+
+    public interface INamedSyntax : IConfigurationSyntax
+    {
+        INamedSyntax HavingLongAlias(string longAlias);
+
+        INamedSyntax DescribedBy(string placeholder, string text);
+
+        INamedSyntax Required();
+    }
+
+    public interface IUnnamedSyntax : IConfigurationSyntax
+    {
+        IUnnamedSyntax DescribedBy(string placeholder, string text);
+
+        IUnnamedSyntax Required();
+    }
+
+    public interface ISwitchSyntax : IConfigurationSyntax
+    {
+        ISwitchSyntax HavingLongAlias(string longAlias);
+
+        IConfigurationSyntax DescribedBy(string text);
     }
 }

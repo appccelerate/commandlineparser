@@ -303,12 +303,12 @@ namespace Appccelerate.CommandLineParser.Specs
             {
                 parser = CommandLineParserConfigurator
                     .Create()
-                    .WithNamed("firstName", s => firstNamedValue = s)
-                    .WithSwitch("firstSwitch", () => firstParsedSwitch = true)
-                    .WithUnnamed(x => firstUnnamedValue = x)
-                    .WithSwitch("secondSwitch", () => secondParsedSwitch = "yeah")
-                    .WithUnnamed(x => secondUnnamedValue = x)
-                    .WithNamed("secondName", s => secondNamedValue = s)
+                        .WithNamed("firstName", s => firstNamedValue = s)
+                        .WithSwitch("firstSwitch", () => firstParsedSwitch = true)
+                        .WithUnnamed(x => firstUnnamedValue = x)
+                        .WithSwitch("secondSwitch", () => secondParsedSwitch = "yeah")
+                        .WithUnnamed(x => secondUnnamedValue = x)
+                        .WithNamed("secondName", s => secondNamedValue = s)
                     .BuildParser();
             });
 

@@ -28,21 +28,36 @@ namespace Appccelerate.CommandLineParser.Sample
             bool debug = false;
             string path = null;
 
-            var parser = CommandLineParserConfigurator
+            var configuration = CommandLineParserConfigurator
                 .Create()
                     .WithNamed("o", v => output = v)
                         .HavingLongAlias("output")
+                        .DescribedBy("output_value", "specifies the output method.")
                     .WithSwitch("d", () => debug = true)
                         .HavingLongAlias("debug")
+                        .DescribedBy("enables debug mode")
                     .WithUnnamed(v => path = v)
                         .Required()
-                .BuildParser();
+                        .DescribedBy("path", "path to the output file.")
+                .BuildConfiguration();
+
+            var parser = new CommandLineParser(configuration);
 
             var parseResult = parser.Parse(args);
 
-            Console.WriteLine(parseResult.Succeeded ? 
-                "parsed successfully: path = " + path + ", output = " + output + ", debug = " + debug : 
-                "parsing failed: " + parseResult.Message);
+            if (!parseResult.Succeeded)
+            {
+                Usage usage = new UsageComposer(configuration).Compose2();
+                Console.WriteLine(parseResult.Message);
+                Console.WriteLine("usage:" + usage.Arguments);
+                Console.WriteLine("options");
+                Console.WriteLine(usage.Options.IndentBy(4));
+                Console.WriteLine();
+
+                return;
+            }
+
+            Console.WriteLine("parsed successfully: path = " + path + ", output = " + output + ", debug = " + debug);
         }
     }
 }

@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CommandLineParserExtensionMethods.cs" company="Appccelerate">
+// <copyright file="SwitchHelp.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,12 +18,16 @@
 
 namespace Appccelerate.CommandLineParser
 {
-    public static class CommandLineParserExtensionMethods
+    public class SwitchHelp : Help
     {
-        public static ICommandLineParser BuildParser(this IConfigurationSyntax configurator)
+        public SwitchHelp()
+            : this(null)
         {
-            var configuration = configurator.BuildConfiguration();
-            return new CommandLineParser(configuration);
+        }
+
+        public SwitchHelp(string description)
+            : base(description)
+        {
         }
     }
 }

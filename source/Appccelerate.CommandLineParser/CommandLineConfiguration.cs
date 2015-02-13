@@ -28,13 +28,15 @@ namespace Appccelerate.CommandLineParser
             IEnumerable<UnnamedArgument> unnamed, 
             IEnumerable<Switch> switches, 
             IEnumerable<Argument> required = null, 
-            IDictionary<string, Argument> longAliases = null)
+            IDictionary<string, Argument> longAliases = null,
+            IDictionary<Argument, Help> help = null)
         {
             this.Named = named;
             this.Unnamed = unnamed;
             this.Switches = switches;
             this.Required = required ?? Enumerable.Empty<Argument>();
             this.LongAliases = longAliases ?? new Dictionary<string, Argument>();
+            this.Help = help ?? new Dictionary<Argument, Help>();
         }
 
         public IEnumerable<NamedArgument> Named { get; set; }
@@ -45,6 +47,8 @@ namespace Appccelerate.CommandLineParser
 
         public IEnumerable<Argument> Required { get; private set; }
 
-        public IDictionary<string, Argument> LongAliases { get; set; }
+        public IDictionary<string, Argument> LongAliases { get; private set; }
+
+        public IDictionary<Argument, Help> Help { get; private set; }
     }
 }
