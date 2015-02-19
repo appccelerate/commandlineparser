@@ -40,16 +40,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Argument.cs" />
+    <Compile Include="Check.cs" />
     <Compile Include="CommandLineConfiguration.cs" />
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="CommandLineParserConfigurator.cs" />
     <Compile Include="CommandLineParserExtensionMethods.cs" />
+    <Compile Include="Describe.cs" />
     <Compile Include="Errors.cs" />
     <Compile Include="Help.cs" />
     <Compile Include="ICommandLineParser.cs" />
     <Compile Include="Indenter.cs" />
     <Compile Include="NamedArgument.cs" />
     <Compile Include="NamedHelp.cs" />
+    <Compile Include="ParseException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />
     <Compile Include="Switch.cs" />

@@ -55,6 +55,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CheckFacts.cs" />
     <Compile Include="CommandLineParserConfiguratorFacts.cs" />
     <Compile Include="CommandLineParserFacts.cs" />
     <Compile Include="IndenterFacts.cs" />

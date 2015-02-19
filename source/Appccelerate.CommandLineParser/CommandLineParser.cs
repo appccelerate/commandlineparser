@@ -18,7 +18,6 @@
 
 namespace Appccelerate.CommandLineParser
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -213,14 +212,6 @@ namespace Appccelerate.CommandLineParser
 
                     throw new ParseException(Errors.RequiredUnnamedArgumentIsMissing);
                 }
-            }
-        }
-
-        private class ParseException : Exception
-        {
-            public ParseException(string message)
-                : base(message)
-            {
             }
         }
     }

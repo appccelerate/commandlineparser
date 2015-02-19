@@ -24,15 +24,18 @@ namespace Appccelerate.CommandLineParser.Sample
     {
         public static void Main(string[] args)
         {
+            const string ShortOutput = "short";
+            const string LongOutput = "long";
+
             string output = null;
             bool debug = false;
             string path = null;
 
             var configuration = CommandLineParserConfigurator
                 .Create()
-                    .WithNamed("o", v => output = v)
+                    .WithNamed("o", v => output = v.CheckForValues(ShortOutput, LongOutput))
                         .HavingLongAlias("output")
-                        .DescribedBy("output_value", "specifies the output method.")
+                        .DescribedBy(Describe.CheckValues(ShortOutput, LongOutput), "specifies the output method.")
                     .WithSwitch("d", () => debug = true)
                         .HavingLongAlias("debug")
                         .DescribedBy("enables debug mode")

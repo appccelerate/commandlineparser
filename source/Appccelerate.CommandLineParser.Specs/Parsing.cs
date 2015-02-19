@@ -22,9 +22,11 @@ namespace Appccelerate.CommandLineParser.Specs
 
     using Xbehave;
 
-    // TODO: arguments with "" and spaces
     public class Parsing
     {
+        const string KnownValue = "known";
+        const string UnknownValue = "unknown";
+
         [Scenario]
         public void UnnamedArguments(
             string[] args,
@@ -280,6 +282,42 @@ namespace Appccelerate.CommandLineParser.Specs
                         firstParsedSwitch, secondParsedSwitch
                     }
                     .Should().Equal(true, "yeah"));
+        }
+
+        [Scenario]
+        [Example(KnownValue, KnownValue, true)]
+        [Example(UnknownValue, null, false)]
+        public void SupportsRestrictedValues(
+            string value,
+            string expectedParsedValue,
+            bool expectedSuccessful,
+            string[] args,
+            string parsedValue,
+            ICommandLineParser parser,
+            ParseResult parseResult)
+        {
+            "establish arguments"._(() =>
+                args = new[]
+                           {
+                               "-n", value
+                           });
+
+            "establish a parsing configuration with value check"._(() =>
+            {
+                parser = CommandLineParserConfigurator
+                    .Create()
+                        .WithNamed("n", v => parsedValue = v.CheckForValues(KnownValue))
+                    .BuildParser();
+            });
+
+            "when parsing"._(() =>
+                parseResult = parser.Parse(args));
+
+            "should parse allowed values"._(() =>
+                parsedValue.Should().Be(expectedParsedValue));
+
+            "should fail for not allowed values"._(() =>
+                parseResult.Succeeded.Should().Be(expectedSuccessful));
         }
 
         [Scenario]

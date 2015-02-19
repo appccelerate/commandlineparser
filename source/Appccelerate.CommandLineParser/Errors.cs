@@ -38,5 +38,10 @@ namespace Appccelerate.CommandLineParser
         {
             return string.Format("Unknown named argument `{0}`.", name);
         }
+
+        public static string ValueNotAllowed(string value, string[] allowedValues)
+        {
+            return string.Format("Value `{0}`is not amongst allowed values `{1}`.", value, string.Join(", ", allowedValues));
+        }
     }
 }
