@@ -283,6 +283,48 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
+        public void Succeeds_WhenAllowedValueForNamedArgumentWithRestrictedValues()
+        {
+            const string Name = "name";
+            const string Allowed = "allowed";
+            string[] allowedValues = { "okay", Allowed, "allowedToo" };
+            
+            var configuration = new CommandLineConfiguration(
+                new[] { new NamedArgument(Name, x => { }) { AllowedValues = allowedValues } },
+                Enumerable.Empty<UnnamedArgument>(),
+                Enumerable.Empty<Switch>(),
+                Enumerable.Empty<Argument>(),
+                new Dictionary<string, Argument> { });
+            var testee = new CommandLineParser(configuration);
+
+            var result = testee.Parse(new[] { "-" + Name, Allowed });
+
+            result.Succeeded.Should().BeTrue();
+        }
+
+        [Fact]
+        public void Fails_WhenNotAllowedValueForNamedArgumentWithRestrictedValues()
+        {
+            const string Name = "name";
+            string[] allowedValues = new[] { "allowed" };
+            const string NotAllowed = "notAllowed";
+
+            var configuration = new CommandLineConfiguration(
+                new[] { new NamedArgument(Name, x => { }) { AllowedValues = allowedValues } },
+                Enumerable.Empty<UnnamedArgument>(),
+                Enumerable.Empty<Switch>(),
+                Enumerable.Empty<Argument>(),
+                new Dictionary<string, Argument> { });
+            var testee = new CommandLineParser(configuration);
+
+            var result = testee.Parse(new[] { "-" + Name, NotAllowed });
+
+            result.Should()
+                .BeFailedParsingResult()
+                    .WithMessage(Errors.ValueNotAllowed(NotAllowed, allowedValues));
+        }
+
+        [Fact]
         public void Fails_WhenUnknownSwitch()
         {
             var configuration = new CommandLineConfiguration(Enumerable.Empty<NamedArgument>(), Enumerable.Empty<UnnamedArgument>(), Enumerable.Empty<Switch>());

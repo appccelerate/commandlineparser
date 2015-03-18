@@ -306,7 +306,8 @@ namespace Appccelerate.CommandLineParser.Specs
             {
                 parser = CommandLineParserConfigurator
                     .Create()
-                        .WithNamed("n", v => parsedValue = v.CheckForValues(KnownValue))
+                        .WithNamed("n", v => parsedValue = v)
+                            .RestrictedTo(KnownValue)
                     .BuildParser();
             });
 

@@ -33,9 +33,10 @@ namespace Appccelerate.CommandLineParser.Sample
 
             var configuration = CommandLineParserConfigurator
                 .Create()
-                    .WithNamed("o", v => output = v.CheckForValues(ShortOutput, LongOutput))
+                    .WithNamed("o", v => output = v)
                         .HavingLongAlias("output")
-                        .DescribedBy(Describe.CheckValues(ShortOutput, LongOutput), "specifies the output method.")
+                        .RestrictedTo(ShortOutput, LongOutput)
+                        .DescribedBy("method", "specifies the output method.")
                     .WithSwitch("d", () => debug = true)
                         .HavingLongAlias("debug")
                         .DescribedBy("enables debug mode")
@@ -50,7 +51,7 @@ namespace Appccelerate.CommandLineParser.Sample
 
             if (!parseResult.Succeeded)
             {
-                Usage usage = new UsageComposer(configuration).Compose2();
+                Usage usage = new UsageComposer(configuration).Compose();
                 Console.WriteLine(parseResult.Message);
                 Console.WriteLine("usage:" + usage.Arguments);
                 Console.WriteLine("options");

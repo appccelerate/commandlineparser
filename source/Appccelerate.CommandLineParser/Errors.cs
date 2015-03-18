@@ -18,6 +18,8 @@
 
 namespace Appccelerate.CommandLineParser
 {
+    using System.Collections.Generic;
+
     public class Errors
     {
         public const string RequiredUnnamedArgumentIsMissing = "Required unnamed argument is missing";
@@ -39,7 +41,7 @@ namespace Appccelerate.CommandLineParser
             return string.Format("Unknown named argument `{0}`.", name);
         }
 
-        public static string ValueNotAllowed(string value, string[] allowedValues)
+        public static string ValueNotAllowed(string value, IEnumerable<string> allowedValues)
         {
             return string.Format("Value `{0}`is not amongst allowed values `{1}`.", value, string.Join(", ", allowedValues));
         }

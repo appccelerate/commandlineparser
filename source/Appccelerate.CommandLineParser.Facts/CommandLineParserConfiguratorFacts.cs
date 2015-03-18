@@ -79,6 +79,21 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
+        public void BuildsNamedArgumentsWithRestrictedValues()
+        {
+            const string Name = "name";
+            const string FirstAllowedValue = "first allowed value";
+            const string SecondAllowedValue = "second allowed value";
+
+            this.testee.WithNamed(Name, x => { })
+                .RestrictedTo(FirstAllowedValue, SecondAllowedValue);
+
+            CommandLineConfiguration result = this.testee.BuildConfiguration();
+
+            result.Named.Single().AllowedValues.Should().BeEquivalentTo(FirstAllowedValue, SecondAllowedValue);
+        }
+
+        [Fact]
         public void BuildsSwitches()
         {
             bool executed = false;

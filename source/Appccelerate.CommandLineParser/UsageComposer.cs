@@ -31,7 +31,7 @@ namespace Appccelerate.CommandLineParser
             this.configuration = configuration;
         }
 
-        public Usage Compose2()
+        public Usage Compose()
         {
             return new Usage(
                 this.GetArguments(), 
@@ -91,11 +91,11 @@ namespace Appccelerate.CommandLineParser
                 var help = this.GetHelp<UnnamedHelp>(unnamedArgument);
                 if (this.configuration.Required.Contains(unnamedArgument))
                 {
-                    arguments.AppendFormat("{0} ", help.Placeholder);
+                    arguments.AppendFormat("<{0}> ", help.Placeholder);
                 }
                 else
                 {
-                    arguments.AppendFormat("[{0}] ", help.Placeholder);
+                    arguments.AppendFormat("[<{0}>] ", help.Placeholder);
                 }
             }
         }
@@ -106,14 +106,27 @@ namespace Appccelerate.CommandLineParser
             {
                 NamedHelp help = this.GetHelp<NamedHelp>(namedArgument);
                 string aliasPart = this.GetAliasPart(namedArgument);
+                string placeholderPart = this.GetPlaceholderPart(namedArgument, help);
 
                 options.AppendFormat(
-                    "-{0} {1}{2}\t{3}{4}",
+                    "-{0} <{1}>{2}\t{3}{4}",
                     namedArgument.Name,
-                    help.ValuePlaceholder,
+                    placeholderPart,
                     aliasPart,
                     help.Description,
                     Environment.NewLine);
+            }
+        }
+
+        private string GetPlaceholderPart(NamedArgument namedArgument, NamedHelp help)
+        {
+            if (namedArgument.AllowedValues != null)
+            {
+                return string.Format("{0} = {{ {1} }}", help.ValuePlaceholder, string.Join(" | ", namedArgument.AllowedValues));
+            }
+            else
+            {
+                return string.Format("{0}", help.ValuePlaceholder);
             }
         }
 
@@ -133,7 +146,7 @@ namespace Appccelerate.CommandLineParser
             foreach (UnnamedArgument unnamedArgument in this.configuration.Unnamed)
             {
                 var help = this.GetHelp<UnnamedHelp>(unnamedArgument);
-                options.AppendFormat("{0}\t{1}{2}", help.Placeholder, help.Description, Environment.NewLine);
+                options.AppendFormat("<{0}>\t{1}{2}", help.Placeholder, help.Description, Environment.NewLine);
             }
         }
 

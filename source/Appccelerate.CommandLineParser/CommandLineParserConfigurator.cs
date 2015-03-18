@@ -67,6 +67,13 @@ namespace Appccelerate.CommandLineParser
             return this.AddLongAlias(longAlias);
         }
 
+        INamedSyntax INamedSyntax.RestrictedTo(params string[] allowedValues)
+        {
+            ((NamedArgument)this.current).AllowedValues = allowedValues;
+
+            return this;
+        }
+
         public ISwitchSyntax WithSwitch(string name, Action callback)
         {
             var argument = new Switch(name, callback);
@@ -154,6 +161,8 @@ namespace Appccelerate.CommandLineParser
         INamedSyntax DescribedBy(string placeholder, string text);
 
         INamedSyntax Required();
+
+        INamedSyntax RestrictedTo(params string[] allowedValues);
     }
 
     public interface IUnnamedSyntax : IConfigurationSyntax

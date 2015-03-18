@@ -20,7 +20,6 @@ namespace Appccelerate.CommandLineParser
 {
     using System;
     using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
 
     using FluentAssertions;
 
@@ -47,11 +46,11 @@ namespace Appccelerate.CommandLineParser
             this.help = new Dictionary<Argument, Help>();
 
             var configuration = new CommandLineConfiguration(
-                this.namedArguments,
-                this.unnamedArguments,
-                this.switches,
-                this.requiredArguments,
-                this.longAliases,
+                this.namedArguments, 
+                this.unnamedArguments, 
+                this.switches, 
+                this.requiredArguments, 
+                this.longAliases, 
                 this.help);
             
             this.testee = new UsageComposer(configuration);
@@ -62,7 +61,7 @@ namespace Appccelerate.CommandLineParser
         {
             this.AddNamedArgument("name", "placeholder", null);
             
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
             result.Arguments.Should().Be("[-name placeholder]");
         }
@@ -73,7 +72,7 @@ namespace Appccelerate.CommandLineParser
             NamedArgument namedArgument = this.AddNamedArgument("name", "placeholder", null);
             this.requiredArguments.Add(namedArgument);
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
             result.Arguments.Should().Be("-name placeholder");
         }
@@ -83,7 +82,7 @@ namespace Appccelerate.CommandLineParser
         {
             this.namedArguments.Add(new NamedArgument("name", _));
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
             result.Arguments.Should().Be("[-name value]");
         }
@@ -95,7 +94,7 @@ namespace Appccelerate.CommandLineParser
             this.namedArguments.Add(namedArgument);
             this.requiredArguments.Add(namedArgument);
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
             result.Arguments.Should().Be("-name value");
         }
@@ -105,9 +104,9 @@ namespace Appccelerate.CommandLineParser
         {
             this.AddUnnamedArgument("placeholder", null);
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
-            result.Arguments.Should().Be("[placeholder]");
+            result.Arguments.Should().Be("[<placeholder>]");
         }
 
         [Fact]
@@ -116,9 +115,9 @@ namespace Appccelerate.CommandLineParser
             UnnamedArgument unnamedArgument = this.AddUnnamedArgument("placeholder", null);
             this.requiredArguments.Add(unnamedArgument);
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
-            result.Arguments.Should().Be("placeholder");
+            result.Arguments.Should().Be("<placeholder>");
         }
 
         [Fact]
@@ -126,9 +125,9 @@ namespace Appccelerate.CommandLineParser
         {
             this.unnamedArguments.Add(new UnnamedArgument(_));
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
-            result.Arguments.Should().Be("[value]");
+            result.Arguments.Should().Be("[<value>]");
         }
 
         [Fact]
@@ -138,9 +137,9 @@ namespace Appccelerate.CommandLineParser
             this.unnamedArguments.Add(unnamedArgument);
             this.requiredArguments.Add(unnamedArgument);
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
-            result.Arguments.Should().Be("value");
+            result.Arguments.Should().Be("<value>");
         }
 
         [Fact]
@@ -148,7 +147,7 @@ namespace Appccelerate.CommandLineParser
         {
             this.AddSwitch("name", null);
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
             result.Arguments.Should().Be("[-name]");
         }
@@ -158,9 +157,9 @@ namespace Appccelerate.CommandLineParser
         {
             this.AddNamedArgument("name", "placeholder", "description");
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
-            result.Options.Should().Be(Lines("-name placeholder\tdescription"));
+            result.Options.Should().Be(Lines("-name <placeholder>\tdescription"));
         }
 
         [Fact]
@@ -170,9 +169,20 @@ namespace Appccelerate.CommandLineParser
             this.longAliases.Add("alias", namedArgument);
             this.longAliases.Add("other_alias", namedArgument);
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
-            result.Options.Should().Be(Lines("-name placeholder (--alias, --other_alias)\tdescription"));
+            result.Options.Should().Be(Lines("-name <placeholder> (--alias, --other_alias)\tdescription"));
+        }
+
+        [Fact]
+        public void ComposesOptionsForNamedArguments_WithRestrictedValues()
+        {
+            NamedArgument namedArgument = this.AddNamedArgument("name", "placeholder", "description");
+            namedArgument.AllowedValues = new[] { "firstAllowed", "secondAllowed" };
+            
+            Usage result = this.testee.Compose();
+
+            result.Options.Should().Be(Lines("-name <placeholder = { firstAllowed | secondAllowed }>\tdescription"));
         }
 
         [Fact]
@@ -180,9 +190,9 @@ namespace Appccelerate.CommandLineParser
         {
             this.AddUnnamedArgument("placeholder", "description");
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
-            result.Options.Should().Be(Lines("placeholder\tdescription"));
+            result.Options.Should().Be(Lines("<placeholder>\tdescription"));
         }
 
         [Fact]
@@ -190,7 +200,7 @@ namespace Appccelerate.CommandLineParser
         {
             this.AddSwitch("switch", "description");
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
             result.Options.Should().Be(Lines("-switch\tdescription"));
         }
@@ -202,7 +212,7 @@ namespace Appccelerate.CommandLineParser
             this.longAliases.Add("alias", switchArgument);
             this.longAliases.Add("other_alias", switchArgument);
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
             result.Options.Should().Be(Lines("-switch (--alias, --other_alias)\tdescription"));
         }
@@ -214,12 +224,12 @@ namespace Appccelerate.CommandLineParser
             this.AddUnnamedArgument("placeholder", "description_unnamed");
             this.AddSwitch("switch", "description_switch");
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
             result.Options.Should().Be(Lines(
-                "-named value\tdescription_named", 
-                "-switch\tdescription_switch",
-                "placeholder\tdescription_unnamed"));
+                "-named <value>\tdescription_named", 
+                "-switch\tdescription_switch", 
+                "<placeholder>\tdescription_unnamed"));
         }
 
         [Fact]
@@ -227,9 +237,9 @@ namespace Appccelerate.CommandLineParser
         {
             this.namedArguments.Add(new NamedArgument("name", _));
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
-            result.Options.Should().Be(Lines("-name value\t"));
+            result.Options.Should().Be(Lines("-name <value>\t"));
         }
 
         [Fact]
@@ -238,7 +248,7 @@ namespace Appccelerate.CommandLineParser
             var switchArgument = new Switch("switch", _);
             this.switches.Add(switchArgument);
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
             result.Options.Should().Be(Lines("-switch\t"));
         }
@@ -248,9 +258,9 @@ namespace Appccelerate.CommandLineParser
         {
             this.unnamedArguments.Add(new UnnamedArgument(_));
 
-            Usage result = this.testee.Compose2();
+            Usage result = this.testee.Compose();
 
-            result.Options.Should().Be(Lines("value\t"));
+            result.Options.Should().Be(Lines("<value>\t"));
         }
 
         private NamedArgument AddNamedArgument(string name, string valuePlaceholder, string description)

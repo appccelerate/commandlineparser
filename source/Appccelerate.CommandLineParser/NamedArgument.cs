@@ -19,6 +19,7 @@
 namespace Appccelerate.CommandLineParser
 {
     using System;
+    using System.Collections.Generic;
 
     public class NamedArgument : Argument
     {
@@ -31,5 +32,7 @@ namespace Appccelerate.CommandLineParser
         public string Name { get; private set; }
         
         public Action<string> Callback { get; private set; }
+
+        public IEnumerable<string> AllowedValues { get; set; }
     }
 }

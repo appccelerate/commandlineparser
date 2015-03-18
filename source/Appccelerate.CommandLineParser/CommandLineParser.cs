@@ -156,9 +156,20 @@ namespace Appccelerate.CommandLineParser
                 this.CheckThatThereIsAValue(identifier);
 
                 var value = this.arguments.Dequeue();
+
+                this.CheckThatValueIsAllowed(namedArgument, value);
+
                 namedArgument.Callback(value);
 
                 this.required.Remove(namedArgument);
+            }
+
+            private void CheckThatValueIsAllowed(NamedArgument namedArgument, string value)
+            {
+                if (namedArgument.AllowedValues != null && !namedArgument.AllowedValues.Contains(value))
+                {
+                    throw new ParseException(Errors.ValueNotAllowed(value, namedArgument.AllowedValues));
+                }
             }
 
             private static void HandleSwitch(Switch switchArgument)
