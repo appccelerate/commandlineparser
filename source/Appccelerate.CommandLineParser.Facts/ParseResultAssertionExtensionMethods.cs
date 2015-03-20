@@ -35,7 +35,7 @@ namespace Appccelerate.CommandLineParser
                 .ForCondition(subject != null)
                 .FailWith("object must be a non-null CommandLineConfiguration");
 
-            foreach (UnnamedArgument unnamedArgument in subject.Unnamed)
+            foreach (IUnnamedArgument unnamedArgument in subject.Unnamed)
             {
                 unnamedArgument.Callback(input);
             }
@@ -60,7 +60,7 @@ namespace Appccelerate.CommandLineParser
                 .ForCondition(count == 1)
                 .FailWith("named argument `{0}` does exist `{1}` times, but was expected to exist exactly once.", name, count);
 
-            NamedArgument namedArgument = subject.Named.Single(n => n.Name == name);
+            INamedArgument namedArgument = subject.Named.Single(n => n.Name == name);
 
             namedArgument.Callback(input);
 

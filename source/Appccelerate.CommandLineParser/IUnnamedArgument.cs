@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Argument.cs" company="Appccelerate">
+// <copyright file="IUnnamedArgument.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,12 +18,12 @@
 
 namespace Appccelerate.CommandLineParser
 {
-    public interface IArgument
-    {
-    }
+    using System;
 
-    public abstract class Argument : IArgument
+    public interface IUnnamedArgument : IArgument
     {
-        public bool IsRequired { get; set; }
+        Action<string> Callback { get; }
+
+        bool IsRequired { get; set; }
     }
 }

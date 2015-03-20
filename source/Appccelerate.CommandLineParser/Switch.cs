@@ -20,7 +20,7 @@ namespace Appccelerate.CommandLineParser
 {
     using System;
 
-    public class Switch : Argument
+    public class Switch : Argument, ISwitch
     {
         public Switch(string name, Action callback)
         {

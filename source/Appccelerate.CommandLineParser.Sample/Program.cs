@@ -30,19 +30,26 @@ namespace Appccelerate.CommandLineParser.Sample
             string output = null;
             bool debug = false;
             string path = null;
+            string value = null;
 
             var configuration = CommandLineParserConfigurator
                 .Create()
                     .WithNamed("o", v => output = v)
                         .HavingLongAlias("output")
+                        .Required()
                         .RestrictedTo(ShortOutput, LongOutput)
                         .DescribedBy("method", "specifies the output method.")
+                    .WithNamed("m", v => output = v)
+                        .HavingLongAlias("message")
+                        .DescribedBy("message", "specifies the message to output.")
                     .WithSwitch("d", () => debug = true)
                         .HavingLongAlias("debug")
                         .DescribedBy("enables debug mode")
                     .WithUnnamed(v => path = v)
                         .Required()
                         .DescribedBy("path", "path to the output file.")
+                    .WithUnnamed(v => value = v)
+                        .DescribedBy("value", "some optional value.")
                 .BuildConfiguration();
 
             var parser = new CommandLineParser(configuration);

@@ -31,28 +31,26 @@ namespace Appccelerate.CommandLineParser
 
         private readonly List<NamedArgument> namedArguments;
         private readonly List<UnnamedArgument> unnamedArguments;
-        private readonly List<Switch> switches;
-        private readonly List<Argument> requiredArguments;
-        private readonly Dictionary<string, Argument> longAliases;
-        private readonly Dictionary<Argument, Help> help;
+        private readonly List<ISwitch> switches;
+
+        private readonly Dictionary<string, IArgument> longAliases;
+        private readonly Dictionary<IArgument, Help> help;
 
         public UsageComposerFacts()
         {
             this.namedArguments = new List<NamedArgument>();
             this.unnamedArguments = new List<UnnamedArgument>();
-            this.switches = new List<Switch>();
-            this.requiredArguments = new List<Argument>();
-            this.longAliases = new Dictionary<string, Argument>();
-            this.help = new Dictionary<Argument, Help>();
+            this.switches = new List<ISwitch>();
+            this.longAliases = new Dictionary<string, IArgument>();
+            this.help = new Dictionary<IArgument, Help>();
 
             var configuration = new CommandLineConfiguration(
-                this.namedArguments, 
-                this.unnamedArguments, 
-                this.switches, 
-                this.requiredArguments, 
-                this.longAliases, 
+                this.namedArguments,
+                this.unnamedArguments,
+                this.switches,
+                this.longAliases,
                 this.help);
-            
+
             this.testee = new UsageComposer(configuration);
         }
 
@@ -60,7 +58,7 @@ namespace Appccelerate.CommandLineParser
         public void ComposesArgumentsForNamedArguments()
         {
             this.AddNamedArgument("name", "placeholder", null);
-            
+
             Usage result = this.testee.Compose();
 
             result.Arguments.Should().Be("[-name placeholder]");
@@ -70,7 +68,7 @@ namespace Appccelerate.CommandLineParser
         public void ComposesArgumentsForRequiredNamedArguments()
         {
             NamedArgument namedArgument = this.AddNamedArgument("name", "placeholder", null);
-            this.requiredArguments.Add(namedArgument);
+            namedArgument.IsRequired = true;
 
             Usage result = this.testee.Compose();
 
@@ -90,9 +88,8 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void ComposesArgumentsForRequiredNamedArguments_WhenNoHelpWasSpecified()
         {
-            var namedArgument = new NamedArgument("name", _);
+            var namedArgument = new NamedArgument("name", _) { IsRequired = true };
             this.namedArguments.Add(namedArgument);
-            this.requiredArguments.Add(namedArgument);
 
             Usage result = this.testee.Compose();
 
@@ -110,10 +107,10 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
-        public void UnnamedComposesArgumentsForUnnamedNamedArguments()
+        public void ComposesArgumentsForRequiredUnnamedNamedArguments()
         {
             UnnamedArgument unnamedArgument = this.AddUnnamedArgument("placeholder", null);
-            this.requiredArguments.Add(unnamedArgument);
+            unnamedArgument.IsRequired = true;
 
             Usage result = this.testee.Compose();
 
@@ -131,11 +128,11 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
-        public void UnnamedComposesArgumentsForUnnamedNamedArguments_WhenNoHelpWasSpecified()
+        public void ComposesArgumentsForRequiredUnnamedNamedArguments_WhenNoHelpWasSpecified()
         {
             UnnamedArgument unnamedArgument = new UnnamedArgument(_);
+            unnamedArgument.IsRequired = true;
             this.unnamedArguments.Add(unnamedArgument);
-            this.requiredArguments.Add(unnamedArgument);
 
             Usage result = this.testee.Compose();
 
@@ -151,8 +148,8 @@ namespace Appccelerate.CommandLineParser
 
             result.Arguments.Should().Be("[-name]");
         }
-        
-        [Fact]         
+
+        [Fact]
         public void ComposesOptionsForNamedArguments()
         {
             this.AddNamedArgument("name", "placeholder", "description");
@@ -178,8 +175,8 @@ namespace Appccelerate.CommandLineParser
         public void ComposesOptionsForNamedArguments_WithRestrictedValues()
         {
             NamedArgument namedArgument = this.AddNamedArgument("name", "placeholder", "description");
-            namedArgument.AllowedValues = new[] { "firstAllowed", "secondAllowed" };
-            
+            namedArgument.AllowedValues = Optional<IEnumerable<string>>.CreateSet(new[] { "firstAllowed", "secondAllowed" });
+
             Usage result = this.testee.Compose();
 
             result.Options.Should().Be(Lines("-name <placeholder = { firstAllowed | secondAllowed }>\tdescription"));
@@ -189,6 +186,17 @@ namespace Appccelerate.CommandLineParser
         public void ComposesOptionsForUnamedArguments()
         {
             this.AddUnnamedArgument("placeholder", "description");
+
+            Usage result = this.testee.Compose();
+
+            result.Options.Should().Be(Lines("<placeholder>\tdescription"));
+        }
+
+        [Fact]
+        public void ComposesOptionsForRequiredUnamedArguments()
+        {
+            UnnamedArgument unnamedArgument = this.AddUnnamedArgument("placeholder", "description");
+            unnamedArgument.IsRequired = true;
 
             Usage result = this.testee.Compose();
 
@@ -216,7 +224,7 @@ namespace Appccelerate.CommandLineParser
 
             result.Options.Should().Be(Lines("-switch (--alias, --other_alias)\tdescription"));
         }
-        
+
         [Fact]
         public void ComposesOptionsForSeveralArguments()
         {
@@ -227,8 +235,8 @@ namespace Appccelerate.CommandLineParser
             Usage result = this.testee.Compose();
 
             result.Options.Should().Be(Lines(
-                "-named <value>\tdescription_named", 
-                "-switch\tdescription_switch", 
+                "-named <value>\tdescription_named",
+                "-switch\tdescription_switch",
                 "<placeholder>\tdescription_unnamed"));
         }
 

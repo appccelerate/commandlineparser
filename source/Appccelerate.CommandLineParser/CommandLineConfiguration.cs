@@ -19,36 +19,31 @@
 namespace Appccelerate.CommandLineParser
 {
     using System.Collections.Generic;
-    using System.Linq;
 
     public class CommandLineConfiguration
     {
         public CommandLineConfiguration(
-            IEnumerable<NamedArgument> named, 
-            IEnumerable<UnnamedArgument> unnamed, 
-            IEnumerable<Switch> switches, 
-            IEnumerable<Argument> required = null, 
-            IDictionary<string, Argument> longAliases = null,
-            IDictionary<Argument, Help> help = null)
+            IEnumerable<INamedArgument> named, 
+            IEnumerable<IUnnamedArgument> unnamed, 
+            IEnumerable<ISwitch> switches, 
+            IDictionary<string, IArgument> longAliases,
+            IDictionary<IArgument, Help> help)
         {
             this.Named = named;
             this.Unnamed = unnamed;
             this.Switches = switches;
-            this.Required = required ?? Enumerable.Empty<Argument>();
-            this.LongAliases = longAliases ?? new Dictionary<string, Argument>();
-            this.Help = help ?? new Dictionary<Argument, Help>();
+            this.LongAliases = longAliases;
+            this.Help = help;
         }
 
-        public IEnumerable<NamedArgument> Named { get; set; }
+        public IEnumerable<INamedArgument> Named { get; private set; }
 
-        public IEnumerable<UnnamedArgument> Unnamed { get; private set; }
+        public IEnumerable<IUnnamedArgument> Unnamed { get; private set; }
 
-        public IEnumerable<Switch> Switches { get; private set; }
+        public IEnumerable<ISwitch> Switches { get; private set; }
 
-        public IEnumerable<Argument> Required { get; private set; }
+        public IDictionary<string, IArgument> LongAliases { get; private set; }
 
-        public IDictionary<string, Argument> LongAliases { get; private set; }
-
-        public IDictionary<Argument, Help> Help { get; private set; }
+        public IDictionary<IArgument, Help> Help { get; private set; }
     }
 }

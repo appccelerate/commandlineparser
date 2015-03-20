@@ -1,5 +1,5 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Check.cs" company="Appccelerate">
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ISwitch.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,18 +18,12 @@
 
 namespace Appccelerate.CommandLineParser
 {
-    using System.Linq;
+    using System;
 
-    public static class Check
+    public interface ISwitch : IArgument
     {
-        public static string CheckForValues(this string value, params string[] allowedValues)
-        {
-            if (!allowedValues.Contains(value))
-            {
-                throw new ParseException(Errors.ValueNotAllowed(value, allowedValues));
-            }
+        string Name { get; }
 
-            return value;
-        }
+        Action Callback { get; }
     }
 }

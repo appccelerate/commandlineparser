@@ -25,10 +25,9 @@ namespace Appccelerate.CommandLineParser
     {
         private readonly List<NamedArgument> named = new List<NamedArgument>();
         private readonly List<UnnamedArgument> unnamed = new List<UnnamedArgument>();
-        private readonly List<Switch> switches = new List<Switch>();
-        private readonly List<Argument> required = new List<Argument>();
-        private readonly Dictionary<string, Argument> longAliases = new Dictionary<string, Argument>();
-        private readonly Dictionary<Argument, Help> help = new Dictionary<Argument, Help>();
+        private readonly List<ISwitch> switches = new List<ISwitch>();
+        private readonly Dictionary<string, IArgument> longAliases = new Dictionary<string, IArgument>();
+        private readonly Dictionary<IArgument, Help> help = new Dictionary<IArgument, Help>();
 
         private Argument current;
 
@@ -69,7 +68,7 @@ namespace Appccelerate.CommandLineParser
 
         INamedSyntax INamedSyntax.RestrictedTo(params string[] allowedValues)
         {
-            ((NamedArgument)this.current).AllowedValues = allowedValues;
+            ((NamedArgument)this.current).AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues);
 
             return this;
         }
@@ -90,20 +89,21 @@ namespace Appccelerate.CommandLineParser
             return new CommandLineConfiguration(
                 this.named, 
                 this.unnamed, 
-                this.switches, 
-                this.required,
+                this.switches,
                 this.longAliases,
                 this.help);
         }
 
         INamedSyntax INamedSyntax.Required()
         {
-            return this.AddCurrentToRequired();
+            this.current.IsRequired = true;
+            return this;
         }
 
         IUnnamedSyntax IUnnamedSyntax.Required()
         {
-            return this.AddCurrentToRequired();
+            this.current.IsRequired = true;
+            return this;
         }
 
         INamedSyntax INamedSyntax.DescribedBy(string placeholder, string text)
@@ -131,13 +131,6 @@ namespace Appccelerate.CommandLineParser
         private CommandLineParserConfigurator AddHelp(Help switchHelp)
         {
             this.help.Add(this.current, switchHelp);
-
-            return this;
-        }
-
-        private CommandLineParserConfigurator AddCurrentToRequired()
-        {
-            this.required.Add(this.current);
 
             return this;
         }

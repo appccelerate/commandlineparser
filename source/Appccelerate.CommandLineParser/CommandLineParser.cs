@@ -39,7 +39,6 @@ namespace Appccelerate.CommandLineParser
                     this.configuration.Named,
                     this.configuration.Unnamed,
                     this.configuration.Switches,
-                    this.configuration.Required,
                     this.configuration.LongAliases);
 
                 parser.Parse();
@@ -55,28 +54,29 @@ namespace Appccelerate.CommandLineParser
         private class Parser
         {
             private readonly Queue<string> arguments;
-            private readonly IDictionary<string, Argument> longAliases;
+            private readonly IDictionary<string, IArgument> longAliases;
 
-            private readonly List<NamedArgument> named;
-            private readonly Queue<UnnamedArgument> unnamed;
-            private readonly List<Switch> switches;
+            private readonly List<INamedArgument> named;
+            private readonly Queue<IUnnamedArgument> unnamed;
+            private readonly List<ISwitch> switches;
 
-            private readonly List<Argument> required;
+            private readonly List<IArgument> required;
 
             public Parser(
                 string[] arguments,
-                IEnumerable<NamedArgument> named,
-                IEnumerable<UnnamedArgument> unnamed,
-                IEnumerable<Switch> switches,
-                IEnumerable<Argument> requiredArguments,
-                IDictionary<string, Argument> longAliases)
+                IEnumerable<INamedArgument> named,
+                IEnumerable<IUnnamedArgument> unnamed,
+                IEnumerable<ISwitch> switches,
+                IDictionary<string, IArgument> longAliases)
             {
                 this.arguments = new Queue<string>(arguments);
-                this.named = new List<NamedArgument>(named);
-                this.unnamed = new Queue<UnnamedArgument>(unnamed);
-                this.switches = new List<Switch>(switches);
-                this.longAliases = new Dictionary<string, Argument>(longAliases);
-                this.required = new List<Argument>(requiredArguments);
+                this.named = new List<INamedArgument>(named);
+                this.unnamed = new Queue<IUnnamedArgument>(unnamed);
+                this.switches = new List<ISwitch>(switches);
+                this.longAliases = new Dictionary<string, IArgument>(longAliases);
+                this.required = new List<IArgument>();
+                this.required.AddRange(this.named.Where(n => n.IsRequired));
+                this.required.AddRange(this.unnamed.Where(u => u.IsRequired));
             }
 
             public void Parse()
@@ -111,7 +111,7 @@ namespace Appccelerate.CommandLineParser
             {
                 string name = arg.Substring(1, arg.Length - 1);
 
-                Switch switchArgument = this.switches.SingleOrDefault(s => s.Name == name);
+                ISwitch switchArgument = this.switches.SingleOrDefault(s => s.Name == name);
 
                 if (switchArgument != null)
                 {
@@ -119,7 +119,7 @@ namespace Appccelerate.CommandLineParser
                 }
                 else
                 {
-                    NamedArgument namedArgument = this.named.SingleOrDefault(n => n.Name == name);
+                    INamedArgument namedArgument = this.named.SingleOrDefault(n => n.Name == name);
 
                     if (namedArgument == null)
                     {
@@ -136,22 +136,22 @@ namespace Appccelerate.CommandLineParser
 
                 this.CheckThatLongAliasIsKnown(longAlias);
 
-                Argument argument = this.longAliases[longAlias];
+                IArgument argument = this.longAliases[longAlias];
 
-                NamedArgument namedArgument = argument as NamedArgument;
+                INamedArgument namedArgument = argument as INamedArgument;
                 if (namedArgument != null)
                 {
                     this.HandleNamed(namedArgument, longAlias);
                 }
 
-                Switch switchArgument = argument as Switch;
+                ISwitch switchArgument = argument as Switch;
                 if (switchArgument != null)
                 {
                     HandleSwitch(switchArgument);
                 }
             }
 
-            private void HandleNamed(NamedArgument namedArgument, string identifier)
+            private void HandleNamed(INamedArgument namedArgument, string identifier)
             {
                 this.CheckThatThereIsAValue(identifier);
 
@@ -164,15 +164,15 @@ namespace Appccelerate.CommandLineParser
                 this.required.Remove(namedArgument);
             }
 
-            private void CheckThatValueIsAllowed(NamedArgument namedArgument, string value)
+            private void CheckThatValueIsAllowed(INamedArgument namedArgument, string value)
             {
-                if (namedArgument.AllowedValues != null && !namedArgument.AllowedValues.Contains(value))
+                if (namedArgument.AllowedValues.IsSet && !namedArgument.AllowedValues.Value.Contains(value))
                 {
-                    throw new ParseException(Errors.ValueNotAllowed(value, namedArgument.AllowedValues));
+                    throw new ParseException(Errors.ValueNotAllowed(value, namedArgument.AllowedValues.Value));
                 }
             }
 
-            private static void HandleSwitch(Switch switchArgument)
+            private static void HandleSwitch(ISwitch switchArgument)
             {
                 switchArgument.Callback();
             }
@@ -181,7 +181,7 @@ namespace Appccelerate.CommandLineParser
             {
                 this.CheckThatThereIsAnUnnamedArgumentPending();
 
-                UnnamedArgument unnamedArgument = this.unnamed.Dequeue();
+                IUnnamedArgument unnamedArgument = this.unnamed.Dequeue();
                 unnamedArgument.Callback(arg);
 
                 this.required.Remove(unnamedArgument);

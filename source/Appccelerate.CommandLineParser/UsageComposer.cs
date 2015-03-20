@@ -62,10 +62,10 @@ namespace Appccelerate.CommandLineParser
 
         private void AppendNamedArguments(StringBuilder arguments)
         {
-            foreach (NamedArgument namedArgument in this.configuration.Named)
+            foreach (INamedArgument namedArgument in this.configuration.Named)
             {
                 NamedHelp help = this.GetHelp<NamedHelp>(namedArgument);
-                if (this.configuration.Required.Contains(namedArgument))
+                if (namedArgument.IsRequired)
                 {
                     arguments.AppendFormat("-{0} {1} ", namedArgument.Name, help.ValuePlaceholder);
                 }
@@ -78,7 +78,7 @@ namespace Appccelerate.CommandLineParser
 
         private void AppendSwitchArguments(StringBuilder arguments)
         {
-            foreach (Switch switchArgument in this.configuration.Switches)
+            foreach (ISwitch switchArgument in this.configuration.Switches)
             {
                 arguments.AppendFormat("[-{0}] ", switchArgument.Name);
             }
@@ -89,7 +89,7 @@ namespace Appccelerate.CommandLineParser
             foreach (UnnamedArgument unnamedArgument in this.configuration.Unnamed)
             {
                 var help = this.GetHelp<UnnamedHelp>(unnamedArgument);
-                if (this.configuration.Required.Contains(unnamedArgument))
+                if (unnamedArgument.IsRequired)
                 {
                     arguments.AppendFormat("<{0}> ", help.Placeholder);
                 }
@@ -102,7 +102,7 @@ namespace Appccelerate.CommandLineParser
 
         private void AppendNamedOptions(StringBuilder options)
         {
-            foreach (NamedArgument namedArgument in this.configuration.Named)
+            foreach (INamedArgument namedArgument in this.configuration.Named)
             {
                 NamedHelp help = this.GetHelp<NamedHelp>(namedArgument);
                 string aliasPart = this.GetAliasPart(namedArgument);
@@ -118,11 +118,11 @@ namespace Appccelerate.CommandLineParser
             }
         }
 
-        private string GetPlaceholderPart(NamedArgument namedArgument, NamedHelp help)
+        private string GetPlaceholderPart(INamedArgument namedArgument, NamedHelp help)
         {
-            if (namedArgument.AllowedValues != null)
+            if (namedArgument.AllowedValues.IsSet)
             {
-                return string.Format("{0} = {{ {1} }}", help.ValuePlaceholder, string.Join(" | ", namedArgument.AllowedValues));
+                return string.Format("{0} = {{ {1} }}", help.ValuePlaceholder, string.Join(" | ", namedArgument.AllowedValues.Value));
             }
             else
             {
@@ -132,7 +132,7 @@ namespace Appccelerate.CommandLineParser
 
         private void AppendSwitchOptions(StringBuilder options)
         {
-            foreach (Switch switchArgument in this.configuration.Switches)
+            foreach (ISwitch switchArgument in this.configuration.Switches)
             {
                 SwitchHelp help = this.GetHelp<SwitchHelp>(switchArgument);
                 string aliasPart = this.GetAliasPart(switchArgument);
@@ -146,11 +146,12 @@ namespace Appccelerate.CommandLineParser
             foreach (UnnamedArgument unnamedArgument in this.configuration.Unnamed)
             {
                 var help = this.GetHelp<UnnamedHelp>(unnamedArgument);
+
                 options.AppendFormat("<{0}>\t{1}{2}", help.Placeholder, help.Description, Environment.NewLine);
             }
         }
 
-        private T GetHelp<T>(Argument argument) where T : Help, new()
+        private T GetHelp<T>(IArgument argument) where T : Help, new()
         {
             Help help;
             T result = null;
@@ -162,7 +163,7 @@ namespace Appccelerate.CommandLineParser
             return result ?? new T();
         }
 
-        private string GetAliasPart(Argument namedArgument)
+        private string GetAliasPart(IArgument namedArgument)
         {
             string aliases = string.Join(
                 ", ",

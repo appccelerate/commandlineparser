@@ -20,7 +20,7 @@ namespace Appccelerate.CommandLineParser
 {
     using System.Collections.Generic;
 
-    public class Errors
+    public static class Errors
     {
         public const string RequiredUnnamedArgumentIsMissing = "Required unnamed argument is missing";
 

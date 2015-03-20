@@ -90,7 +90,7 @@ namespace Appccelerate.CommandLineParser
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            result.Named.Single().AllowedValues.Should().BeEquivalentTo(FirstAllowedValue, SecondAllowedValue);
+            result.Named.Single().AllowedValues.Value.Should().BeEquivalentTo(FirstAllowedValue, SecondAllowedValue);
         }
 
         [Fact]
@@ -133,7 +133,7 @@ namespace Appccelerate.CommandLineParser
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            result.Required.OfType<NamedArgument>().Should().Contain(x => x.Name == Name);
+            result.Named.Should().ContainSingle(n => n.IsRequired);
         }
 
         [Fact]
@@ -145,7 +145,7 @@ namespace Appccelerate.CommandLineParser
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            result.Required.OfType<UnnamedArgument>().Should().NotBeEmpty();
+            result.Unnamed.Should().ContainSingle(u => u.IsRequired);
         }
 
         [Fact]

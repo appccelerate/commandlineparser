@@ -40,7 +40,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Argument.cs" />
-    <Compile Include="Check.cs" />
     <Compile Include="CommandLineConfiguration.cs" />
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="CommandLineParserConfigurator.cs" />
@@ -49,7 +48,10 @@
     <Compile Include="Errors.cs" />
     <Compile Include="Help.cs" />
     <Compile Include="ICommandLineParser.cs" />
+    <Compile Include="INamedArgument.cs" />
     <Compile Include="Indenter.cs" />
+    <Compile Include="ISwitch.cs" />
+    <Compile Include="IUnnamedArgument.cs" />
     <Compile Include="NamedArgument.cs" />
     <Compile Include="NamedHelp.cs" />
     <Compile Include="ParseException.cs" />

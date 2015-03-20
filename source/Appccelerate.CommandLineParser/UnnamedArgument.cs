@@ -20,7 +20,7 @@ namespace Appccelerate.CommandLineParser
 {
     using System;
 
-    public class UnnamedArgument : Argument
+    public class UnnamedArgument : Argument, IUnnamedArgument
     {
         public UnnamedArgument(Action<string> callback)
         {
