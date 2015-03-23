@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UnnamedArgument.cs" company="Appccelerate">
+// <copyright file="Optional.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,18 +20,48 @@ namespace Appccelerate.CommandLineParser
 {
     using System;
 
-    public class UnnamedArgument : Argument, IUnnamedArgument
+    public class Optional<T>
     {
-        private readonly Action<string> callback;
+        private readonly T value;
 
-        public UnnamedArgument(Action<string> callback)
+        public static Optional<T> CreateSet(T value)
         {
-            this.callback = callback;
+            return new Optional<T>(value);
         }
 
-        public void Handle(string value)
+        public static Optional<T> CreateNotSet()
         {
-            this.callback(value);
+            return new Optional<T>();
+        }
+
+        private Optional()
+        {
+            this.IsSet = false;
+        }
+
+        private Optional(T value)
+        {
+            this.IsSet = true;
+            this.value = value;
+        }
+
+        public T Value
+        {
+            get
+            {
+                if (!this.IsSet)
+                {
+                    throw new InvalidOperationException("Optional value is not set and cannot be queried.");
+                }
+
+                return this.value;
+            }
+        }
+
+        public bool IsSet
+        {
+            get;
+            private set;
         }
     }
 }

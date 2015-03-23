@@ -26,7 +26,7 @@ namespace Appccelerate.CommandLineParser
         private readonly List<NamedArgument> named = new List<NamedArgument>();
         private readonly List<UnnamedArgument> unnamed = new List<UnnamedArgument>();
         private readonly List<ISwitch> switches = new List<ISwitch>();
-        private readonly Dictionary<string, IArgument> longAliases = new Dictionary<string, IArgument>();
+        private readonly Dictionary<string, IArgumentWithName> longAliases = new Dictionary<string, IArgumentWithName>();
         private readonly Dictionary<IArgument, Help> help = new Dictionary<IArgument, Help>();
 
         private Argument current;
@@ -123,7 +123,7 @@ namespace Appccelerate.CommandLineParser
 
         private CommandLineParserConfigurator AddLongAlias(string longAlias)
         {
-            this.longAliases.Add(longAlias, this.current);
+            this.longAliases.Add(longAlias, (IArgumentWithName)this.current);
 
             return this;
         }

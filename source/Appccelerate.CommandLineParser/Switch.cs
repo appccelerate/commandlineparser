@@ -22,14 +22,20 @@ namespace Appccelerate.CommandLineParser
 
     public class Switch : Argument, ISwitch
     {
+        private readonly Action callback;
+
         public Switch(string name, Action callback)
         {
+            this.callback = callback;
+
             this.Name = name;
-            this.Callback = callback;
         }
 
         public string Name { get; private set; }
 
-        public Action Callback { get; private set; }
+        public void Handle()
+        {
+            this.callback();
+        }
     }
 }

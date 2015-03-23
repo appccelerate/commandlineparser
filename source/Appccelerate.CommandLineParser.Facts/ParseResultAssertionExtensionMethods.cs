@@ -37,7 +37,7 @@ namespace Appccelerate.CommandLineParser
 
             foreach (IUnnamedArgument unnamedArgument in subject.Unnamed)
             {
-                unnamedArgument.Callback(input);
+                unnamedArgument.Handle(input);
             }
 
             Execute.Assertion
@@ -62,7 +62,7 @@ namespace Appccelerate.CommandLineParser
 
             INamedArgument namedArgument = subject.Named.Single(n => n.Name == name);
 
-            namedArgument.Callback(input);
+            namedArgument.Handle(input);
 
             Execute.Assertion
                 .ForCondition(validation())
@@ -82,7 +82,7 @@ namespace Appccelerate.CommandLineParser
                 .ForCondition(count == 1)
                 .FailWith("switch `{0}` does exist `{1}` times, but was expected to exist exactly once.", name, count);
 
-            subject.Switches.Single(n => n.Name == name).Callback();
+            subject.Switches.Single(n => n.Name == name).Handle();
 
             Execute.Assertion
                 .ForCondition(validation())

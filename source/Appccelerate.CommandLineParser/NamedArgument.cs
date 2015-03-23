@@ -20,65 +20,36 @@ namespace Appccelerate.CommandLineParser
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     public class NamedArgument : Argument, INamedArgument
     {
+        private readonly Action<string> callback;
+
         public NamedArgument(string shortName, Action<string> callback)
         {
             this.Name = shortName;
-            this.Callback = callback;
+            this.callback = callback;
             this.AllowedValues = Optional<IEnumerable<string>>.CreateNotSet();
         }
 
         public string Name { get; private set; }
-        
-        public Action<string> Callback { get; private set; }
 
         public Optional<IEnumerable<string>> AllowedValues { get; set; }
-    }
 
-    public class Optional<T>
-    {
-        private readonly T value;
-
-        public static Optional<T> CreateSet(T value)
+        public void Handle(string value)
         {
-            return new Optional<T>(value);
+            this.CheckThatValueIsAllowed(value);
+
+            this.callback(value);
         }
 
-        public static Optional<T> CreateNotSet()
+        private void CheckThatValueIsAllowed(string value)
         {
-            return new Optional<T>();
-        }
-
-        public Optional()
-        {
-            this.IsSet = false;
-        }
-
-        private Optional(T value)
-        {
-            this.IsSet = true;
-            this.value = value;
-        }
-
-        public T Value
-        {
-            get
+            if (this.AllowedValues.IsSet && !this.AllowedValues.Value.Contains(value))
             {
-                if (!this.IsSet)
-                {
-                    throw new InvalidOperationException("Optional value is not set and cannot be queried.");
-                }
-
-                return this.value;
+                throw new ParseException(Errors.ValueNotAllowed(value, this.AllowedValues.Value));
             }
-        }
-
-        public bool IsSet
-        {
-            get;
-            private set;
         }
     }
 }

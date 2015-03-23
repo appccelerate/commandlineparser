@@ -20,10 +20,13 @@ namespace Appccelerate.CommandLineParser
 {
     using System;
 
-    public interface ISwitch : IArgument
+    public interface IArgumentWithName : IArgument
     {
         string Name { get; }
+    }
 
-        Action Callback { get; }
+    public interface ISwitch : IArgument, IArgumentWithName
+    {
+        void Handle();
     }
 }

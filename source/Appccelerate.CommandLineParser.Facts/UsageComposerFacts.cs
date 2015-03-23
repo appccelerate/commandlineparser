@@ -33,7 +33,7 @@ namespace Appccelerate.CommandLineParser
         private readonly List<UnnamedArgument> unnamedArguments;
         private readonly List<ISwitch> switches;
 
-        private readonly Dictionary<string, IArgument> longAliases;
+        private readonly Dictionary<string, IArgumentWithName> longAliases;
         private readonly Dictionary<IArgument, Help> help;
 
         public UsageComposerFacts()
@@ -41,7 +41,7 @@ namespace Appccelerate.CommandLineParser
             this.namedArguments = new List<NamedArgument>();
             this.unnamedArguments = new List<UnnamedArgument>();
             this.switches = new List<ISwitch>();
-            this.longAliases = new Dictionary<string, IArgument>();
+            this.longAliases = new Dictionary<string, IArgumentWithName>();
             this.help = new Dictionary<IArgument, Help>();
 
             var configuration = new CommandLineConfiguration(

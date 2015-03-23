@@ -34,7 +34,7 @@ namespace Appccelerate.CommandLineParser
         private static readonly IEnumerable<INamedArgument> NoNamedArguments = Enumerable.Empty<INamedArgument>();
         private static readonly IEnumerable<ISwitch> NoSwitchArguments = Enumerable.Empty<ISwitch>();
         private static readonly IEnumerable<IUnnamedArgument> NoUnnamedArguments = Enumerable.Empty<IUnnamedArgument>();
-        private static readonly IDictionary<string, IArgument> NoLongAliases = new Dictionary<string, IArgument>();
+        private static readonly IDictionary<string, IArgumentWithName> NoLongAliases = new Dictionary<string, IArgumentWithName>();
         private static readonly IDictionary<IArgument, Help> NoHelp = new Dictionary<IArgument, Help>();
 
         [Fact]
@@ -108,7 +108,7 @@ namespace Appccelerate.CommandLineParser
                                      new NamedArgument(SecondName, x => parsedArguments[1] = x)
                                  };
 
-            var longAliases = new Dictionary<string, IArgument>()
+            var longAliases = new Dictionary<string, IArgumentWithName>()
                                   {
                                      { SecondLongAlias, namedArguments[1] }
                                   };
@@ -165,7 +165,7 @@ namespace Appccelerate.CommandLineParser
                                        new Switch(FirstSwitch, () => firstAssigned = true), 
                                        new Switch(SecondSwitch, () => secondAssigned = true)
                                    };
-            var longAliases = new Dictionary<string, IArgument>
+            var longAliases = new Dictionary<string, IArgumentWithName>
                                   {
                                      { FirstSwitchLongAlias, switches[0] }, 
                                      { SecondSwitchLongAlias, switches[1] }
@@ -382,7 +382,7 @@ namespace Appccelerate.CommandLineParser
                 new[] { namedArgument }, 
                 NoUnnamedArguments, 
                 NoSwitchArguments, 
-                new Dictionary<string, IArgument>
+                new Dictionary<string, IArgumentWithName>
                     {
                         { "known", namedArgument }
                     }, 

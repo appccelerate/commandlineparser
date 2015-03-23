@@ -26,7 +26,7 @@ namespace Appccelerate.CommandLineParser
             IEnumerable<INamedArgument> named, 
             IEnumerable<IUnnamedArgument> unnamed, 
             IEnumerable<ISwitch> switches, 
-            IDictionary<string, IArgument> longAliases,
+            IDictionary<string, IArgumentWithName> longAliases,
             IDictionary<IArgument, Help> help)
         {
             this.Named = named;
@@ -34,7 +34,15 @@ namespace Appccelerate.CommandLineParser
             this.Switches = switches;
             this.LongAliases = longAliases;
             this.Help = help;
+
+            var arguments = new List<IArgument>();
+            arguments.AddRange(named);
+            arguments.AddRange(unnamed);
+            arguments.AddRange(switches);
+            this.Arguments = arguments;
         }
+
+        public IEnumerable<IArgument> Arguments { get; private set; }
 
         public IEnumerable<INamedArgument> Named { get; private set; }
 
@@ -42,7 +50,7 @@ namespace Appccelerate.CommandLineParser
 
         public IEnumerable<ISwitch> Switches { get; private set; }
 
-        public IDictionary<string, IArgument> LongAliases { get; private set; }
+        public IDictionary<string, IArgumentWithName> LongAliases { get; private set; }
 
         public IDictionary<IArgument, Help> Help { get; private set; }
     }

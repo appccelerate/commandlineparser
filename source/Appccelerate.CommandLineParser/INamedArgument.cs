@@ -21,14 +21,14 @@ namespace Appccelerate.CommandLineParser
     using System;
     using System.Collections.Generic;
 
-    public interface INamedArgument : IArgument
+    public interface INamedArgument : IArgument, IArgumentWithName
     {
         string Name { get; }
-
-        Action<string> Callback { get; }
 
         Optional<IEnumerable<string>> AllowedValues { get;  }
 
         bool IsRequired { get; }
+
+        void Handle(string value);
     }
 }

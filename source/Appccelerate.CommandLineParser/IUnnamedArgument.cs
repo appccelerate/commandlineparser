@@ -22,8 +22,8 @@ namespace Appccelerate.CommandLineParser
 
     public interface IUnnamedArgument : IArgument
     {
-        Action<string> Callback { get; }
-
         bool IsRequired { get; set; }
+
+        void Handle(string value);
     }
 }
