@@ -35,7 +35,7 @@ namespace Appccelerate.CommandLineParser
                 .ForCondition(subject != null)
                 .FailWith("object must be a non-null CommandLineConfiguration");
 
-            foreach (IUnnamedArgument unnamedArgument in subject.Unnamed)
+            foreach (IUnnamedArgument unnamedArgument in subject.Arguments.OfType<IUnnamedArgument>())
             {
                 unnamedArgument.Handle(input);
             }
@@ -55,12 +55,12 @@ namespace Appccelerate.CommandLineParser
                 .ForCondition(subject != null)
                 .FailWith("object must be a non-null CommandLineConfiguration");
 
-            int count = subject.Named.Count(n => n.Name == name);
+            int count = subject.Arguments.OfType<INamedArgument>().Count(n => n.Name == name);
             Execute.Assertion
                 .ForCondition(count == 1)
                 .FailWith("named argument `{0}` does exist `{1}` times, but was expected to exist exactly once.", name, count);
 
-            INamedArgument namedArgument = subject.Named.Single(n => n.Name == name);
+            INamedArgument namedArgument = subject.Arguments.OfType<INamedArgument>().Single(n => n.Name == name);
 
             namedArgument.Handle(input);
 
@@ -77,12 +77,12 @@ namespace Appccelerate.CommandLineParser
                 .ForCondition(subject != null)
                 .FailWith("object must be a non-null CommandLineConfiguration");
 
-            int count = subject.Switches.Count(n => n.Name == name);
+            int count = subject.Arguments.OfType<ISwitch>().Count(n => n.Name == name);
             Execute.Assertion
                 .ForCondition(count == 1)
                 .FailWith("switch `{0}` does exist `{1}` times, but was expected to exist exactly once.", name, count);
 
-            subject.Switches.Single(n => n.Name == name).Handle();
+            subject.Arguments.OfType<ISwitch>().Single(n => n.Name == name).Handle();
 
             Execute.Assertion
                 .ForCondition(validation())

@@ -21,15 +21,12 @@ namespace Appccelerate.CommandLineParser
     using System;
     using System.Collections.Generic;
 
-    public class CommandLineParserConfigurator : INamedSyntax, IUnnamedSyntax, ISwitchSyntax
+    public class CommandLineParserConfigurator : IConfigurationSyntax
     {
-        private readonly List<NamedArgument> named = new List<NamedArgument>();
-        private readonly List<UnnamedArgument> unnamed = new List<UnnamedArgument>();
-        private readonly List<ISwitch> switches = new List<ISwitch>();
+        private readonly List<Argument> arguments = new List<Argument>();
         private readonly Dictionary<string, IArgumentWithName> longAliases = new Dictionary<string, IArgumentWithName>();
+        private readonly List<IArgument> requiredArguments = new List<IArgument>();
         private readonly Dictionary<IArgument, Help> help = new Dictionary<IArgument, Help>();
-
-        private Argument current;
 
         public static IConfigurationSyntax Create()
         {
@@ -38,101 +35,204 @@ namespace Appccelerate.CommandLineParser
 
         public IUnnamedSyntax WithUnnamed(Action<string> callback)
         {
-            var unnamedArgument = new UnnamedArgument(callback);
-            this.unnamed.Add(unnamedArgument);
-
-            this.current = unnamedArgument;
-
-            return this;
+            return new UnnamedArgumentComposer(
+                callback,
+                this,
+                this.arguments,
+                this.help,
+                this.requiredArguments);
         }
         
         public INamedSyntax WithNamed(string name, Action<string> callback)
         {
-            var namedArgument = new NamedArgument(name, callback);
-            this.named.Add(namedArgument);
-
-            this.current = namedArgument;
-
-            return this;
-        }
-
-        INamedSyntax INamedSyntax.HavingLongAlias(string longAlias)
-        {
-            return this.AddLongAlias(longAlias);
-        }
-
-        ISwitchSyntax ISwitchSyntax.HavingLongAlias(string longAlias)
-        {
-            return this.AddLongAlias(longAlias);
-        }
-
-        INamedSyntax INamedSyntax.RestrictedTo(params string[] allowedValues)
-        {
-            ((NamedArgument)this.current).AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues);
-
-            return this;
+            return new NamedArgumentComposer(
+                name, 
+                callback, 
+                this, 
+                this.arguments, 
+                this.longAliases, 
+                this.help, 
+                this.requiredArguments);
         }
 
         public ISwitchSyntax WithSwitch(string name, Action callback)
         {
-            var argument = new Switch(name, callback);
-
-            this.switches.Add(argument);
-
-            this.current = argument;
-
-            return this;
+            return new SwitchComposer(
+                name,
+                callback,
+                this,
+                this.arguments,
+                this.longAliases,
+                this.help);
         }
 
         public CommandLineConfiguration BuildConfiguration()
         {
             return new CommandLineConfiguration(
-                this.named, 
-                this.unnamed, 
-                this.switches,
+                this.arguments,
                 this.longAliases,
+                this.requiredArguments,
                 this.help);
         }
 
-        INamedSyntax INamedSyntax.Required()
+        private class NamedArgumentComposer : Composer, INamedSyntax
         {
-            this.current.IsRequired = true;
-            return this;
+            private readonly Dictionary<string, IArgumentWithName> longAliases;
+
+            private readonly Dictionary<IArgument, Help> help;
+
+            private readonly List<IArgument> required;
+
+            private readonly NamedArgument current;
+
+            public NamedArgumentComposer(
+                string name, 
+                Action<string> callback,
+                CommandLineParserConfigurator configurator,
+                List<Argument> arguments,
+                Dictionary<string, IArgumentWithName> longAliases,
+                Dictionary<IArgument, Help> help,
+                List<IArgument> required)
+                : base(configurator)
+            {
+                this.help = help;
+                this.required = required;
+                this.longAliases = longAliases;
+
+                this.current = new NamedArgument(name, callback);
+                arguments.Add(this.current);
+            }
+
+            public INamedSyntax HavingLongAlias(string longAlias)
+            {
+                this.longAliases.Add(longAlias, this.current);
+
+                return this;
+            }
+
+            public INamedSyntax DescribedBy(string placeholder, string text)
+            {
+                this.help.Add(this.current, new NamedHelp(placeholder, text, this.current.AllowedValues));
+
+                return this;
+            }
+
+            public INamedSyntax Required()
+            {
+                this.required.Add(this.current);
+
+                return this;
+            }
+
+            public INamedSyntax RestrictedTo(params string[] allowedValues)
+            {
+                this.current.AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues);
+
+                return this;
+            }
         }
 
-        IUnnamedSyntax IUnnamedSyntax.Required()
+        private class UnnamedArgumentComposer : Composer, IUnnamedSyntax
         {
-            this.current.IsRequired = true;
-            return this;
+            private Dictionary<IArgument, Help> help;
+            private List<IArgument> required;
+            private UnnamedArgument current;
+
+            public UnnamedArgumentComposer(
+                Action<string> callback,
+                CommandLineParserConfigurator configurator,
+                List<Argument> arguments,
+                Dictionary<IArgument, Help> help,
+                List<IArgument> required)
+                : base(configurator)
+            {
+                this.help = help;
+                this.required = required;
+
+                this.current = new UnnamedArgument(callback);
+                arguments.Add(this.current);
+            }
+
+            public IUnnamedSyntax DescribedBy(string placeholder, string text)
+            {
+                this.help.Add(this.current, new UnnamedHelp(placeholder, text));
+
+                return this;
+            }
+
+            public IUnnamedSyntax Required()
+            {
+                this.required.Add(this.current);
+
+                return this;
+            }
         }
 
-        INamedSyntax INamedSyntax.DescribedBy(string placeholder, string text)
+        private class SwitchComposer : Composer, ISwitchSyntax
         {
-            return this.AddHelp(new NamedHelp(placeholder, text));
+            private Dictionary<IArgument, Help> help;
+            private Dictionary<string, IArgumentWithName> longAliases;
+            private Switch current;
+
+            public SwitchComposer(
+                string name,
+                Action callback,
+                CommandLineParserConfigurator configurator,
+                List<Argument> arguments,
+                Dictionary<string, IArgumentWithName> longAliases,
+                Dictionary<IArgument, Help> help)
+                : base(configurator)
+            {
+                this.help = help;
+                this.longAliases = longAliases;
+
+                this.current = new Switch(name, callback);
+                arguments.Add(this.current);
+            }
+
+            public ISwitchSyntax HavingLongAlias(string longAlias)
+            {
+                this.longAliases.Add(longAlias, this.current);
+
+                return this;
+            }
+
+            public IConfigurationSyntax DescribedBy(string text)
+            {
+                this.help.Add(this.current, new SwitchHelp(text));
+
+                return this;
+            }
         }
 
-        IUnnamedSyntax IUnnamedSyntax.DescribedBy(string placeholder, string text)
+        private abstract class Composer
         {
-            return this.AddHelp(new UnnamedHelp(placeholder, text));
-        }
+            private readonly CommandLineParserConfigurator configurator;
 
-        IConfigurationSyntax ISwitchSyntax.DescribedBy(string text)
-        {
-            return this.AddHelp(new SwitchHelp(text));
-        }
+            protected Composer(CommandLineParserConfigurator configurator)
+            {
+                this.configurator = configurator;
+            }
 
-        private CommandLineParserConfigurator AddLongAlias(string longAlias)
-        {
-            this.longAliases.Add(longAlias, (IArgumentWithName)this.current);
+            public IUnnamedSyntax WithUnnamed(Action<string> callback)
+            {
+                return this.configurator.WithUnnamed(callback);
+            }
 
-            return this;
-        }
+            public INamedSyntax WithNamed(string name, Action<string> callback)
+            {
+                return this.configurator.WithNamed(name, callback);
+            }
 
-        private CommandLineParserConfigurator AddHelp(Help switchHelp)
-        {
-            this.help.Add(this.current, switchHelp);
+            public ISwitchSyntax WithSwitch(string name, Action callback)
+            {
+                return this.configurator.WithSwitch(name, callback);
+            }
 
-            return this;
+            public CommandLineConfiguration BuildConfiguration()
+            {
+                return this.configurator.BuildConfiguration();
+            }
         }
     }
 

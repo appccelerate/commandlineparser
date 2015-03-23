@@ -18,19 +18,24 @@
 
 namespace Appccelerate.CommandLineParser
 {
+    using System.Collections.Generic;
+
     public class NamedHelp : Help
     {
         public NamedHelp()
-            : this("value", null)
+            : this("value", null, Optional<IEnumerable<string>>.CreateNotSet())
         {
         }
 
-        public NamedHelp(string valuePlaceholder, string description)
+        public NamedHelp(string valuePlaceholder, string description, Optional<IEnumerable<string>> allowedValues)
             : base(description)
         {
+            this.AllowedValues = allowedValues;
             this.ValuePlaceholder = valuePlaceholder;
         }
 
         public string ValuePlaceholder { get; private set; }
+
+        public Optional<IEnumerable<string>> AllowedValues { get; private set; }
     }
 }

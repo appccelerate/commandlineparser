@@ -31,10 +31,12 @@ namespace Appccelerate.CommandLineParser
     // TODO: a callback throws an exception
     public class CommandLineParserFacts
     {
+        private static readonly IEnumerable<IArgument> NoArguments = Enumerable.Empty<IArgument>();
         private static readonly IEnumerable<INamedArgument> NoNamedArguments = Enumerable.Empty<INamedArgument>();
         private static readonly IEnumerable<ISwitch> NoSwitchArguments = Enumerable.Empty<ISwitch>();
         private static readonly IEnumerable<IUnnamedArgument> NoUnnamedArguments = Enumerable.Empty<IUnnamedArgument>();
         private static readonly IDictionary<string, IArgumentWithName> NoLongAliases = new Dictionary<string, IArgumentWithName>();
+        private static readonly IEnumerable<IArgument> NoRequiredArguments = new List<IArgument>();
         private static readonly IDictionary<IArgument, Help> NoHelp = new Dictionary<IArgument, Help>();
 
         [Fact]
@@ -51,10 +53,9 @@ namespace Appccelerate.CommandLineParser
                                            new UnnamedArgument(x => parsedArguments[1] = x)
                                        };
             var configuration = new CommandLineConfiguration(
-                NoNamedArguments, 
                 unnamedArguments, 
-                NoSwitchArguments, 
                 NoLongAliases, 
+                NoRequiredArguments,
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 
@@ -80,9 +81,8 @@ namespace Appccelerate.CommandLineParser
                                  };
             var configuration = new CommandLineConfiguration(
                 namedArguments, 
-                NoUnnamedArguments, 
-                NoSwitchArguments, 
-                NoLongAliases, 
+                NoLongAliases,
+                NoRequiredArguments,
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 
@@ -114,9 +114,8 @@ namespace Appccelerate.CommandLineParser
                                   };
             var configuration = new CommandLineConfiguration(
                 namedArguments, 
-                NoUnnamedArguments, 
-                NoSwitchArguments, 
                 longAliases, 
+                NoRequiredArguments,
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 
@@ -137,10 +136,9 @@ namespace Appccelerate.CommandLineParser
                                    new Switch("switchReloaded", () => secondAssigned = true)
                                };
             var configuration = new CommandLineConfiguration(
-                NoNamedArguments, 
-                NoUnnamedArguments, 
                 switches, 
-                NoLongAliases, 
+                NoLongAliases,
+                NoRequiredArguments,
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 
@@ -172,10 +170,9 @@ namespace Appccelerate.CommandLineParser
                                   };
 
             var configuration = new CommandLineConfiguration(
-                NoNamedArguments, 
-                NoUnnamedArguments, 
                 switches, 
-                longAliases, 
+                longAliases,
+                NoRequiredArguments,
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 
@@ -188,13 +185,12 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void Fails_WhenRequiredNamedArgumentIsMissing()
         {
-            var namedArgument = new NamedArgument("name", v => { }) { IsRequired = true };
+            var namedArgument = new NamedArgument("name", v => { });
 
             var configuration = new CommandLineConfiguration(
                 new[] { namedArgument }, 
-                NoUnnamedArguments, 
-                NoSwitchArguments, 
-                NoLongAliases, 
+                NoLongAliases,
+                new[] { namedArgument },
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 
@@ -212,9 +208,8 @@ namespace Appccelerate.CommandLineParser
 
             var configuration = new CommandLineConfiguration(
                 new[] { namedArgument }, 
-                NoUnnamedArguments, 
-                NoSwitchArguments, 
-                NoLongAliases, 
+                NoLongAliases,
+                NoRequiredArguments,
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 
@@ -226,13 +221,12 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void Fails_WhenRequiredUnnamedArgumentIsMissing()
         {
-            var unnamedArgument = new UnnamedArgument(v => { }) { IsRequired = true };
+            var unnamedArgument = new UnnamedArgument(v => { });
 
             var configuration = new CommandLineConfiguration(
-                NoNamedArguments, 
                 new[] { unnamedArgument }, 
-                NoSwitchArguments, 
-                NoLongAliases, 
+                NoLongAliases,
+                new[] { unnamedArgument },
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 
@@ -249,10 +243,9 @@ namespace Appccelerate.CommandLineParser
             var unnamedArgument = new UnnamedArgument(v => { });
 
             var configuration = new CommandLineConfiguration(
-                NoNamedArguments, 
                 new[] { unnamedArgument }, 
-                NoSwitchArguments, 
-                NoLongAliases, 
+                NoLongAliases,
+                NoRequiredArguments,
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 
@@ -264,7 +257,7 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void Fails_WhenTooManyUnnamedArguments()
         {
-            var configuration = new CommandLineConfiguration(NoNamedArguments, NoUnnamedArguments, NoSwitchArguments, NoLongAliases, NoHelp);
+            var configuration = new CommandLineConfiguration(NoArguments, NoLongAliases, NoRequiredArguments, NoHelp);
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new[] { "unknown" });
@@ -277,7 +270,7 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void Fails_WhenUnknownNamedArgument()
         {
-            var configuration = new CommandLineConfiguration(NoNamedArguments, NoUnnamedArguments, NoSwitchArguments, NoLongAliases, NoHelp); 
+            var configuration = new CommandLineConfiguration(NoArguments, NoLongAliases, NoRequiredArguments, NoHelp); 
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new[] { "-unknown", "value" });
@@ -290,7 +283,7 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void Fails_WhenUnknownLongAliasForNamedArgument()
         {
-            var configuration = new CommandLineConfiguration(NoNamedArguments, NoUnnamedArguments, NoSwitchArguments, NoLongAliases, NoHelp);
+            var configuration = new CommandLineConfiguration(NoArguments, NoLongAliases, NoRequiredArguments, NoHelp);
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new[] { "--unknown", "value" });
@@ -309,9 +302,8 @@ namespace Appccelerate.CommandLineParser
 
             var configuration = new CommandLineConfiguration(
                 new[] { new NamedArgument(Name, x => { }) { AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues) } }, 
-                NoUnnamedArguments, 
-                NoSwitchArguments, 
-                NoLongAliases, 
+                NoLongAliases,
+                NoRequiredArguments,
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 
@@ -329,9 +321,8 @@ namespace Appccelerate.CommandLineParser
 
             var configuration = new CommandLineConfiguration(
                 new[] { new NamedArgument(Name, x => { }) { AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues) } }, 
-                NoUnnamedArguments, 
-                NoSwitchArguments, 
-                NoLongAliases, 
+                NoLongAliases,
+                NoRequiredArguments,
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 
@@ -345,7 +336,7 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void Fails_WhenUnknownSwitch()
         {
-            var configuration = new CommandLineConfiguration(NoNamedArguments, NoUnnamedArguments, NoSwitchArguments, NoLongAliases, NoHelp);
+            var configuration = new CommandLineConfiguration(NoArguments, NoLongAliases, NoRequiredArguments, NoHelp);
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new[] { "-unknown" });
@@ -360,9 +351,8 @@ namespace Appccelerate.CommandLineParser
         {
             var configuration = new CommandLineConfiguration(
                 new[] { new NamedArgument("known", s => { }) }, 
-                NoUnnamedArguments, 
-                NoSwitchArguments, 
-                NoLongAliases, 
+                NoLongAliases,
+                NoRequiredArguments,
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 
@@ -380,12 +370,11 @@ namespace Appccelerate.CommandLineParser
 
             var configuration = new CommandLineConfiguration(
                 new[] { namedArgument }, 
-                NoUnnamedArguments, 
-                NoSwitchArguments, 
                 new Dictionary<string, IArgumentWithName>
                     {
                         { "known", namedArgument }
-                    }, 
+                    },
+                NoRequiredArguments,
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 

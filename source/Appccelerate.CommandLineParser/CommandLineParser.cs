@@ -36,10 +36,9 @@ namespace Appccelerate.CommandLineParser
             {
                 var parser = new Parser(
                     args, 
-                    this.configuration.Named,
-                    this.configuration.Unnamed,
-                    this.configuration.Switches,
-                    this.configuration.LongAliases);
+                    this.configuration.Arguments,
+                    this.configuration.LongAliases,
+                    this.configuration.RequiredArguments);
 
                 parser.Parse();
                
@@ -64,21 +63,14 @@ namespace Appccelerate.CommandLineParser
 
             public Parser(
                 string[] arguments,
-                IEnumerable<INamedArgument> named,
-                IEnumerable<IUnnamedArgument> unnamed,
-                IEnumerable<ISwitch> switches,
-                IDictionary<string, IArgumentWithName> longAliases)
+                IEnumerable<IArgument> configuration,
+                IDictionary<string, IArgumentWithName> longAliases,
+                IEnumerable<IArgument> requiredArguments)
             {
                 this.arguments = new Queue<string>(arguments);
+                this.configuration = new List<IArgument>(configuration);
+                this.required = new List<IArgument>(requiredArguments);
                 this.longAliases = new Dictionary<string, IArgumentWithName>(longAliases);
-                this.required = new List<IArgument>();
-                this.required.AddRange(named.Where(n => n.IsRequired));
-                this.required.AddRange(unnamed.Where(u => u.IsRequired));
-
-                this.configuration = new List<IArgument>();
-                this.configuration.AddRange(named);
-                this.configuration.AddRange(unnamed);
-                this.configuration.AddRange(switches);
 
                 this.unnamed = new Queue<IUnnamedArgument>(this.configuration.OfType<IUnnamedArgument>());
             }

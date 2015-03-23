@@ -24,6 +24,5 @@ namespace Appccelerate.CommandLineParser
 
     public abstract class Argument : IArgument
     {
-        public bool IsRequired { get; set; }
     }
 }

@@ -18,12 +18,8 @@
 
 namespace Appccelerate.CommandLineParser
 {
-    using System;
-
     public interface IUnnamedArgument : IArgument
     {
-        bool IsRequired { get; set; }
-
         void Handle(string value);
     }
 }

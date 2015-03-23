@@ -23,34 +23,22 @@ namespace Appccelerate.CommandLineParser
     public class CommandLineConfiguration
     {
         public CommandLineConfiguration(
-            IEnumerable<INamedArgument> named, 
-            IEnumerable<IUnnamedArgument> unnamed, 
-            IEnumerable<ISwitch> switches, 
+            IEnumerable<IArgument> arguments, 
             IDictionary<string, IArgumentWithName> longAliases,
+            IEnumerable<IArgument> requiredArguments,
             IDictionary<IArgument, Help> help)
         {
-            this.Named = named;
-            this.Unnamed = unnamed;
-            this.Switches = switches;
-            this.LongAliases = longAliases;
-            this.Help = help;
-
-            var arguments = new List<IArgument>();
-            arguments.AddRange(named);
-            arguments.AddRange(unnamed);
-            arguments.AddRange(switches);
             this.Arguments = arguments;
+            this.LongAliases = longAliases;
+            this.RequiredArguments = requiredArguments;
+            this.Help = help;
         }
 
         public IEnumerable<IArgument> Arguments { get; private set; }
 
-        public IEnumerable<INamedArgument> Named { get; private set; }
-
-        public IEnumerable<IUnnamedArgument> Unnamed { get; private set; }
-
-        public IEnumerable<ISwitch> Switches { get; private set; }
-
         public IDictionary<string, IArgumentWithName> LongAliases { get; private set; }
+
+        public IEnumerable<IArgument> RequiredArguments { get; private set; }
 
         public IDictionary<IArgument, Help> Help { get; private set; }
     }
