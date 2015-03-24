@@ -1,5 +1,4 @@
-﻿
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CommandLineParserFacts.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
@@ -22,22 +21,23 @@ namespace Appccelerate.CommandLineParser
     using System.Collections.Generic;
     using System.Linq;
 
+    using Appccelerate.CommandLineParser.Arguments;
+
     using FluentAssertions;
     using FluentAssertions.Execution;
     using FluentAssertions.Primitives;
 
     using Xunit;
 
+    using Switch = Appccelerate.CommandLineParser.Arguments.Switch;
+
     // TODO: a callback throws an exception
     public class CommandLineParserFacts
     {
         private static readonly IEnumerable<IArgument> NoArguments = Enumerable.Empty<IArgument>();
-        private static readonly IEnumerable<INamedArgument> NoNamedArguments = Enumerable.Empty<INamedArgument>();
-        private static readonly IEnumerable<ISwitch> NoSwitchArguments = Enumerable.Empty<ISwitch>();
-        private static readonly IEnumerable<IUnnamedArgument> NoUnnamedArguments = Enumerable.Empty<IUnnamedArgument>();
         private static readonly IDictionary<string, IArgumentWithName> NoLongAliases = new Dictionary<string, IArgumentWithName>();
         private static readonly IEnumerable<IArgument> NoRequiredArguments = new List<IArgument>();
-        private static readonly IDictionary<IArgument, Help> NoHelp = new Dictionary<IArgument, Help>();
+        private static readonly IEnumerable<Help.Help> NoHelp = Enumerable.Empty<Help.Help>();
 
         [Fact]
         public void ParsesUnnamedArguments()
@@ -49,8 +49,8 @@ namespace Appccelerate.CommandLineParser
 
             var unnamedArguments = new[]
                                        { 
-                                           new UnnamedArgument(x => parsedArguments[0] = x), 
-                                           new UnnamedArgument(x => parsedArguments[1] = x)
+                                           new UnnamedArgument<string>(x => parsedArguments[0] = x), 
+                                           new UnnamedArgument<string>(x => parsedArguments[1] = x)
                                        };
             var configuration = new CommandLineConfiguration(
                 unnamedArguments, 
@@ -76,8 +76,8 @@ namespace Appccelerate.CommandLineParser
 
             var namedArguments = new[]
                                  {
-                                     new NamedArgument(FirstName, x => parsedArguments[0] = x), 
-                                     new NamedArgument(SecondName, x => parsedArguments[1] = x)
+                                     new NamedArgument<string>(FirstName, x => parsedArguments[0] = x), 
+                                     new NamedArgument<string>(SecondName, x => parsedArguments[1] = x)
                                  };
             var configuration = new CommandLineConfiguration(
                 namedArguments, 
@@ -104,8 +104,8 @@ namespace Appccelerate.CommandLineParser
 
             var namedArguments = new[]
                                  {
-                                     new NamedArgument(FirstName, x => parsedArguments[0] = x), 
-                                     new NamedArgument(SecondName, x => parsedArguments[1] = x)
+                                     new NamedArgument<string>(FirstName, x => parsedArguments[0] = x), 
+                                     new NamedArgument<string>(SecondName, x => parsedArguments[1] = x)
                                  };
 
             var longAliases = new Dictionary<string, IArgumentWithName>()
@@ -183,9 +183,26 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
+        public void ConvertsValues()
+        {
+            int parsedValue = 0;
+
+            var configuration = new CommandLineConfiguration(
+                new[] { new NamedArgument<int>("value", v => parsedValue = v), },
+                NoLongAliases,
+                NoRequiredArguments,
+                NoHelp);
+            var testee = new CommandLineParser(configuration);
+
+            testee.Parse(new[] { "-value", "42" });
+
+            parsedValue.Should().Be(42);
+        }
+
+        [Fact]
         public void Fails_WhenRequiredNamedArgumentIsMissing()
         {
-            var namedArgument = new NamedArgument("name", v => { });
+            var namedArgument = new NamedArgument<string>("name", v => { });
 
             var configuration = new CommandLineConfiguration(
                 new[] { namedArgument }, 
@@ -198,13 +215,13 @@ namespace Appccelerate.CommandLineParser
 
             result.Should()
                 .BeFailedParsingResult()
-                    .WithMessage(Errors.RequiredNamedArgumentIsMissing("name"));
+                    .WithMessage(Errors.Errors.RequiredNamedArgumentIsMissing("name"));
         }
 
         [Fact]
         public void Succeeds_WhenRequiredNamedArgumentsArePresent()
         {
-            var namedArgument = new NamedArgument("name", v => { });
+            var namedArgument = new NamedArgument<string>("name", v => { });
 
             var configuration = new CommandLineConfiguration(
                 new[] { namedArgument }, 
@@ -221,7 +238,7 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void Fails_WhenRequiredUnnamedArgumentIsMissing()
         {
-            var unnamedArgument = new UnnamedArgument(v => { });
+            var unnamedArgument = new UnnamedArgument<string>(v => { });
 
             var configuration = new CommandLineConfiguration(
                 new[] { unnamedArgument }, 
@@ -234,13 +251,13 @@ namespace Appccelerate.CommandLineParser
 
             result.Should()
                 .BeFailedParsingResult()
-                    .WithMessage(Errors.RequiredUnnamedArgumentIsMissing);
+                    .WithMessage(Errors.Errors.RequiredUnnamedArgumentIsMissing);
         }
 
         [Fact]
         public void Succeeds_WhenRequiredUnnamedArgumentsArePresent()
         {
-            var unnamedArgument = new UnnamedArgument(v => { });
+            var unnamedArgument = new UnnamedArgument<string>(v => { });
 
             var configuration = new CommandLineConfiguration(
                 new[] { unnamedArgument }, 
@@ -264,7 +281,7 @@ namespace Appccelerate.CommandLineParser
 
             result.Should()
                 .BeFailedParsingResult()
-                    .WithMessage(Errors.TooManyUnnamedArguments);
+                    .WithMessage(Errors.Errors.TooManyUnnamedArguments);
         }
 
         [Fact]
@@ -277,7 +294,7 @@ namespace Appccelerate.CommandLineParser
 
             result.Should()
                 .BeFailedParsingResult()
-                    .WithMessage(Errors.UnknownArgument("unknown"));
+                    .WithMessage(Errors.Errors.UnknownArgument("unknown"));
         }
 
         [Fact]
@@ -290,7 +307,7 @@ namespace Appccelerate.CommandLineParser
 
             result.Should()
                 .BeFailedParsingResult()
-                    .WithMessage(Errors.UnknownArgument("unknown"));
+                    .WithMessage(Errors.Errors.UnknownArgument("unknown"));
         }
 
         [Fact]
@@ -301,7 +318,7 @@ namespace Appccelerate.CommandLineParser
             string[] allowedValues = { "okay", Allowed, "allowedToo" };
 
             var configuration = new CommandLineConfiguration(
-                new[] { new NamedArgument(Name, x => { }) { AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues) } }, 
+                new[] { new NamedArgument<string>(Name, x => { }) { AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues) } }, 
                 NoLongAliases,
                 NoRequiredArguments,
                 NoHelp);
@@ -320,7 +337,7 @@ namespace Appccelerate.CommandLineParser
             const string NotAllowed = "notAllowed";
 
             var configuration = new CommandLineConfiguration(
-                new[] { new NamedArgument(Name, x => { }) { AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues) } }, 
+                new[] { new NamedArgument<string>(Name, x => { }) { AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues) } }, 
                 NoLongAliases,
                 NoRequiredArguments,
                 NoHelp);
@@ -330,7 +347,7 @@ namespace Appccelerate.CommandLineParser
 
             result.Should()
                 .BeFailedParsingResult()
-                    .WithMessage(Errors.ValueNotAllowed(NotAllowed, allowedValues));
+                    .WithMessage(Errors.Errors.ValueNotAllowed(NotAllowed, allowedValues));
         }
 
         [Fact]
@@ -343,14 +360,14 @@ namespace Appccelerate.CommandLineParser
 
             result.Should()
                 .BeFailedParsingResult()
-                    .WithMessage(Errors.UnknownArgument("unknown"));
+                    .WithMessage(Errors.Errors.UnknownArgument("unknown"));
         }
 
         [Fact]
         public void Fails_WhenNamedArgumentHasNoValue()
         {
             var configuration = new CommandLineConfiguration(
-                new[] { new NamedArgument("known", s => { }) }, 
+                new[] { new NamedArgument<string>("known", s => { }) }, 
                 NoLongAliases,
                 NoRequiredArguments,
                 NoHelp);
@@ -360,13 +377,13 @@ namespace Appccelerate.CommandLineParser
 
             result.Should()
                 .BeFailedParsingResult()
-                    .WithMessage(Errors.NamedArgumentValueIsMissing("known"));
+                    .WithMessage(Errors.Errors.NamedArgumentValueIsMissing("known"));
         }
 
         [Fact]
         public void Fails_WhenNamedArgumentSpecifiedByLongAliasHasNoValue()
         {
-            var namedArgument = new NamedArgument("k", s => { });
+            var namedArgument = new NamedArgument<string>("k", s => { });
 
             var configuration = new CommandLineConfiguration(
                 new[] { namedArgument }, 
@@ -382,7 +399,7 @@ namespace Appccelerate.CommandLineParser
 
             result.Should()
                 .BeFailedParsingResult()
-                    .WithMessage(Errors.NamedArgumentValueIsMissing("known"));
+                    .WithMessage(Errors.Errors.NamedArgumentValueIsMissing("known"));
         }
     }
 
@@ -407,7 +424,7 @@ namespace Appccelerate.CommandLineParser
                 .FailWith("expected a non-null ParseResult, but is {0}", assertions.Subject);
 
             Execute.Assertion
-                .ForCondition(!parseResult.Succeeded)
+                .ForCondition(parseResult != null && !parseResult.Succeeded)
                 .FailWith("expected a failed ParseResult", assertions.Subject);
 
             return new ParsingResultContext(parseResult);

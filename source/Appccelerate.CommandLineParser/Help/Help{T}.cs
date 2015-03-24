@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SwitchHelp.cs" company="Appccelerate">
+// <copyright file="Help{T}.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,18 +16,33 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser
+namespace Appccelerate.CommandLineParser.Help
 {
-    public class SwitchHelp : Help
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Appccelerate.CommandLineParser.Arguments;
+
+    public abstract class Help<T> : Help where T : Argument
     {
-        public SwitchHelp()
-            : this(null)
+        protected Help(T argument)
+            : base(argument)
         {
+            this.Argument = argument;
+            this.Description = string.Empty;
         }
 
-        public SwitchHelp(string description)
-            : base(description)
+        public string Description { get; set; }
+        
+        protected new T Argument { get; private set; }
+
+        protected string GetAliasPart(IEnumerable<string> longAliases)
         {
+            string aliases = string.Join(
+                ", ",
+                longAliases.Select(x => "--" + x));
+
+            return aliases != string.Empty ? " (" + aliases + ")" : string.Empty;
         }
     }
 }

@@ -16,21 +16,31 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser
+namespace Appccelerate.CommandLineParser.Help
 {
-    public class UnnamedHelp : Help
+    using System.Collections.Generic;
+    using System.Text;
+
+    using Appccelerate.CommandLineParser.Arguments;
+
+    public class UnnamedHelp<T> : Help<UnnamedArgument<T>>
     {
-        public UnnamedHelp()
-            : this("value", null)
+        public UnnamedHelp(UnnamedArgument<T> argument)
+            : base(argument)
         {
+            this.Placeholder = "value";
         }
 
-        public UnnamedHelp(string placeholder, string description)
-            : base(description)
+        public string Placeholder { get; set; }
+
+        public override void WriteArgumentTo(StringBuilder arguments)
         {
-            this.Placeholder = placeholder;
+            arguments.AppendFormat("<{0}>", this.Placeholder);
         }
 
-        public string Placeholder { get; private set; }
+        public override void WriteOptionTo(IEnumerable<string> longAliases, StringBuilder options)
+        {
+            options.AppendFormat("<{0}>\t{1}", this.Placeholder, this.Description);
+        }
     }
 }

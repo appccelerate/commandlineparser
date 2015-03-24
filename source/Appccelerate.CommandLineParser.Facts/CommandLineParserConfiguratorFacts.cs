@@ -20,6 +20,9 @@ namespace Appccelerate.CommandLineParser
 {
     using System.Linq;
 
+    using Appccelerate.CommandLineParser.Arguments;
+    using Appccelerate.CommandLineParser.Help;
+
     using FluentAssertions;
 
     using Xunit;
@@ -73,7 +76,7 @@ namespace Appccelerate.CommandLineParser
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
             result.LongAliases
-                .Select(x => new { x.Key, Value = x.Value as NamedArgument })
+                .Select(x => new { x.Key, Value = x.Value as INamedArgument })
                 .Select(x => new { x.Key, Name = x.Value != null ? x.Value.Name : null })
                 .Should().ContainSingle(x => x.Key == LongAlias && x.Name == Name);
         }
@@ -90,7 +93,7 @@ namespace Appccelerate.CommandLineParser
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            result.Arguments.OfType<NamedArgument>().Single().AllowedValues.Value
+            result.Arguments.OfType<NamedArgument<string>>().Single().AllowedValues.Value
                 .Should().BeEquivalentTo(FirstAllowedValue, SecondAllowedValue);
         }
 
@@ -161,11 +164,26 @@ namespace Appccelerate.CommandLineParser
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            var namedHelpEntries = result.Help.Where(x => x.Key is NamedArgument).ToList();
-            namedHelpEntries.Select(x => x.Value).OfType<NamedHelp>()
+            result.Help.OfType<NamedHelp<string>>()
                 .Should().ContainSingle(x =>
                     x.ValuePlaceholder == ValuePlaceholder &&
                     x.Description == Description);
+        }
+
+        [Fact]
+        public void BuildsNamedArgumentsHelp_WhenNoHelpWasSpecified()
+        {
+            const string Name = "name";
+
+            this.testee
+                .WithNamed(Name, x => { });
+
+            CommandLineConfiguration result = this.testee.BuildConfiguration();
+
+            result.Help.OfType<NamedHelp<string>>()
+                .Should().ContainSingle(x =>
+                    x.ValuePlaceholder == "value" &&
+                    x.Description == string.Empty);
         }
 
         [Fact]
@@ -179,11 +197,24 @@ namespace Appccelerate.CommandLineParser
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            var unnamedHelpEntries = result.Help.Where(x => x.Key is UnnamedArgument).ToList();
-            unnamedHelpEntries.Select(x => x.Value).OfType<UnnamedHelp>()
+            result.Help.OfType<UnnamedHelp<string>>()
                 .Should().ContainSingle(x =>
                     x.Placeholder == Placeholder &&
                     x.Description == Description);
+        }
+
+        [Fact]
+        public void BuildsUnnamedArgumentsHelp_WhenNoHelpWasSpecified()
+        {
+            this.testee
+                .WithUnnamed(x => { });
+
+            CommandLineConfiguration result = this.testee.BuildConfiguration();
+
+            result.Help.OfType<UnnamedHelp<string>>()
+                .Should().ContainSingle(x =>
+                    x.Placeholder == "value" &&
+                    x.Description == string.Empty);
         }
 
         [Fact]
@@ -191,16 +222,31 @@ namespace Appccelerate.CommandLineParser
         {
             const string Name = "name";
             const string Description = "description";
+            
             this.testee
                 .WithSwitch(Name, () => { })
                     .DescribedBy(Description);
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            var switchHelpEntries = result.Help.Where(x => x.Key is Switch).ToList();
-            switchHelpEntries.Select(x => x.Value).OfType<SwitchHelp>()
+            result.Help.OfType<SwitchHelp>()
                 .Should().ContainSingle(x =>
                     x.Description == Description);
+        }
+
+        [Fact]
+        public void BuildsSwitchHelp_WhenNoHelpWasSpecified()
+        {
+            const string Name = "name";
+            
+            this.testee
+                .WithSwitch(Name, () => { });
+
+            CommandLineConfiguration result = this.testee.BuildConfiguration();
+
+            result.Help.OfType<SwitchHelp>()
+                .Should().ContainSingle(x =>
+                    x.Description == string.Empty);
         }
     }
 }

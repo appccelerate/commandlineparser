@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UnnamedArgument.cs" company="Appccelerate">
+// <copyright file="ParseResult.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,20 +18,16 @@
 
 namespace Appccelerate.CommandLineParser
 {
-    using System;
-
-    public class UnnamedArgument : Argument, IUnnamedArgument
+    public class ParseResult
     {
-        private readonly Action<string> callback;
-
-        public UnnamedArgument(Action<string> callback)
+        public ParseResult(bool succeeded, string message)
         {
-            this.callback = callback;
+            this.Succeeded = succeeded;
+            this.Message = message;
         }
 
-        public void Handle(string value)
-        {
-            this.callback(value);
-        }
+        public bool Succeeded { get; private set; }
+
+        public string Message { get; private set; }
     }
 }

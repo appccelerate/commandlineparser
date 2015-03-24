@@ -39,29 +39,31 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Argument.cs" />
+    <Compile Include="Arguments\Argument.cs" />
+    <Compile Include="Arguments\IArgument.cs" />
+    <Compile Include="Arguments\IArgumentWithName.cs" />
+    <Compile Include="Arguments\INamedArgument.cs" />
+    <Compile Include="Arguments\ISwitch.cs" />
+    <Compile Include="Arguments\IUnnamedArgument.cs" />
+    <Compile Include="Arguments\NamedArgument.cs" />
+    <Compile Include="Arguments\Optional.cs" />
+    <Compile Include="Arguments\Switch.cs" />
+    <Compile Include="Arguments\UnnamedArgument.cs" />
     <Compile Include="CommandLineConfiguration.cs" />
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="CommandLineParserConfigurator.cs" />
-    <Compile Include="CommandLineParserExtensionMethods.cs" />
-    <Compile Include="Describe.cs" />
-    <Compile Include="Errors.cs" />
-    <Compile Include="Help.cs" />
+    <Compile Include="Errors\Errors.cs" />
+    <Compile Include="Errors\ParseException.cs" />
+    <Compile Include="Help\Help.cs" />
+    <Compile Include="Help\Help{T}.cs" />
+    <Compile Include="Help\NamedHelp.cs" />
+    <Compile Include="Help\SwitchHelp.cs" />
+    <Compile Include="Help\UnnamedHelp.cs" />
     <Compile Include="ICommandLineParser.cs" />
-    <Compile Include="INamedArgument.cs" />
     <Compile Include="Indenter.cs" />
-    <Compile Include="ISwitch.cs" />
-    <Compile Include="IUnnamedArgument.cs" />
-    <Compile Include="NamedArgument.cs" />
-    <Compile Include="NamedHelp.cs" />
-    <Compile Include="Optional.cs" />
-    <Compile Include="ParseException.cs" />
+    <Compile Include="ParseResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />
-    <Compile Include="Switch.cs" />
-    <Compile Include="SwitchHelp.cs" />
-    <Compile Include="UnnamedArgument.cs" />
-    <Compile Include="UnnamedHelp.cs" />
     <Compile Include="Usage.cs" />
     <Compile Include="UsageComposer.cs" />
   </ItemGroup>

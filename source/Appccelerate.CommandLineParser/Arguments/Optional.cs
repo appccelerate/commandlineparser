@@ -16,7 +16,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser
+namespace Appccelerate.CommandLineParser.Arguments
 {
     using System;
 

@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Help.cs" company="Appccelerate">
+// <copyright file="ISwitch.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,15 +16,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser
+namespace Appccelerate.CommandLineParser.Arguments
 {
-    public abstract class Help
+    public interface ISwitch : IArgumentWithName
     {
-        protected Help(string description)
-        {
-            this.Description = description;
-        }
-
-        public string Description { get; private set; }
+        void Handle();
     }
 }

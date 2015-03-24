@@ -21,12 +21,70 @@ namespace Appccelerate.CommandLineParser
     using System;
     using System.Collections.Generic;
 
+    using Appccelerate.CommandLineParser.Arguments;
+    using Appccelerate.CommandLineParser.Help;
+
+    /// <summary>
+    /// Use the <see cref="CommandLineParserConfigurator"/> to create a <see cref="CommandLineConfiguration"/>
+    /// that can be passed to a <see cref="CommandLineParser"/> for parsing and a <see cref="UsageComposer"/> for creating a help message.
+    /// </summary>
+    /// <example>
+    /// <code>
+    ///        const string ShortOutput = "short";
+    ///        const string LongOutput = "long";
+    ///
+    ///        // set default values here
+    ///        string output = null;
+    ///        bool debug = false;
+    ///        string path = null;
+    ///        string value = null;
+    ///        int threshold = 0;
+    ///
+    ///        var configuration = CommandLineParserConfigurator
+    ///            .Create()
+    ///                .WithNamed("o", v => output = v)
+    ///                    .HavingLongAlias("output")
+    ///                    .Required()
+    ///                    .RestrictedTo(ShortOutput, LongOutput)
+    ///                    .DescribedBy("method", "specifies the output method.")
+    ///                .WithNamed("t", (int v) => threshold = v)
+    ///                    .HavingLongAlias("threshold")
+    ///                    .DescribedBy("value", "specifies the threshold used in output.")
+    ///                .WithSwitch("d", () => debug = true)
+    ///                    .HavingLongAlias("debug")
+    ///                    .DescribedBy("enables debug mode")
+    ///                .WithUnnamed(v => path = v)
+    ///                    .Required()
+    ///                    .DescribedBy("path", "path to the output file.")
+    ///                .WithUnnamed(v => value = v)
+    ///                    .DescribedBy("value", "some optional value.")
+    ///            .BuildConfiguration();
+    ///
+    ///        var parser = new CommandLineParser(configuration);
+    ///
+    ///        var parseResult = parser.Parse(args);
+    ///
+    ///        if (!parseResult.Succeeded)
+    ///        {
+    ///            Usage usage = new UsageComposer(configuration).Compose();
+    ///            Console.WriteLine(parseResult.Message);
+    ///            Console.WriteLine("usage:" + usage.Arguments);
+    ///            Console.WriteLine("options");
+    ///            Console.WriteLine(usage.Options.IndentBy(4));
+    ///            Console.WriteLine();
+    ///
+    ///            return;
+    ///        }
+    ///
+    ///        Console.WriteLine("parsed successfully: path = " + path + ", value = " + value + "output = " + output + ", debug = " + debug + ", threshold = " + threshold);
+    /// </code>
+    /// </example>
     public class CommandLineParserConfigurator : IConfigurationSyntax
     {
         private readonly List<Argument> arguments = new List<Argument>();
         private readonly Dictionary<string, IArgumentWithName> longAliases = new Dictionary<string, IArgumentWithName>();
         private readonly List<IArgument> requiredArguments = new List<IArgument>();
-        private readonly Dictionary<IArgument, Help> help = new Dictionary<IArgument, Help>();
+        private readonly List<Help.Help> help = new List<Help.Help>();
 
         public static IConfigurationSyntax Create()
         {
@@ -35,24 +93,46 @@ namespace Appccelerate.CommandLineParser
 
         public IUnnamedSyntax WithUnnamed(Action<string> callback)
         {
-            return new UnnamedArgumentComposer(
+            return new UnnamedArgumentComposer<string>(
                 callback,
                 this,
-                this.arguments,
-                this.help,
-                this.requiredArguments);
+                a => this.arguments.Add(a),
+                a => this.requiredArguments.Add(a),
+                h => this.help.Add(h));
         }
-        
-        public INamedSyntax WithNamed(string name, Action<string> callback)
+
+        public IUnnamedSyntax WithUnnamed<T>(Action<T> callback)
         {
-            return new NamedArgumentComposer(
-                name, 
-                callback, 
-                this, 
-                this.arguments, 
-                this.longAliases, 
-                this.help, 
-                this.requiredArguments);
+            return new UnnamedArgumentComposer<T>(
+                callback,
+                this,
+                a => this.arguments.Add(a),
+                a => this.requiredArguments.Add(a),
+                h => this.help.Add(h));
+        }
+
+        public INamedSyntax<string> WithNamed(string name, Action<string> callback)
+        {
+            return new NamedArgumentComposer<string>(
+                name,
+                callback,
+                this,
+                a => this.arguments.Add(a),
+                (alias, argument) => this.longAliases.Add(alias, argument),
+                a => this.requiredArguments.Add(a),
+                h => this.help.Add(h));
+        }
+
+        public INamedSyntax<T> WithNamed<T>(string name, Action<T> callback)
+        {
+            return new NamedArgumentComposer<T>(
+                name,
+                callback,
+                this,
+                a => this.arguments.Add(a),
+                (alias, argument) => this.longAliases.Add(alias, argument),
+                a => this.requiredArguments.Add(a),
+                h => this.help.Add(h));
         }
 
         public ISwitchSyntax WithSwitch(string name, Action callback)
@@ -61,9 +141,9 @@ namespace Appccelerate.CommandLineParser
                 name,
                 callback,
                 this,
-                this.arguments,
-                this.longAliases,
-                this.help);
+                a => this.arguments.Add(a),
+                (alias, argument) => this.longAliases.Add(alias, argument),
+                h => this.help.Add(h));
         }
 
         public CommandLineConfiguration BuildConfiguration()
@@ -75,94 +155,99 @@ namespace Appccelerate.CommandLineParser
                 this.help);
         }
 
-        private class NamedArgumentComposer : Composer, INamedSyntax
+        private class NamedArgumentComposer<T> : Composer, INamedSyntax<T>
         {
-            private readonly Dictionary<string, IArgumentWithName> longAliases;
+            private readonly Action<string, IArgumentWithName> addLongAlias;
+            private readonly Action<IArgument> addToRequired;
 
-            private readonly Dictionary<IArgument, Help> help;
-
-            private readonly List<IArgument> required;
-
-            private readonly NamedArgument current;
+            private readonly NamedArgument<T> current;
+            private readonly NamedHelp<T> help;
 
             public NamedArgumentComposer(
-                string name, 
-                Action<string> callback,
+                string name,
+                Action<T> callback,
                 CommandLineParserConfigurator configurator,
-                List<Argument> arguments,
-                Dictionary<string, IArgumentWithName> longAliases,
-                Dictionary<IArgument, Help> help,
-                List<IArgument> required)
+                Action<Argument> addToArguments,
+                Action<string, IArgumentWithName> addLongAlias,
+                Action<IArgument> addToRequired,
+                Action<Help.Help> addToHelp)
                 : base(configurator)
             {
-                this.help = help;
-                this.required = required;
-                this.longAliases = longAliases;
+                this.addLongAlias = addLongAlias;
+                this.addToRequired = addToRequired;
 
-                this.current = new NamedArgument(name, callback);
-                arguments.Add(this.current);
+                this.current = new NamedArgument<T>(name, callback);
+                this.help = new NamedHelp<T>(this.current);
+
+                addToArguments(this.current);
+                addToHelp(this.help);
             }
 
-            public INamedSyntax HavingLongAlias(string longAlias)
+            public INamedSyntax<T> HavingLongAlias(string longAlias)
             {
-                this.longAliases.Add(longAlias, this.current);
+                this.addLongAlias(longAlias, this.current);
 
                 return this;
             }
 
-            public INamedSyntax DescribedBy(string placeholder, string text)
+            public INamedSyntax<T> DescribedBy(string valuePlaceholder, string description)
             {
-                this.help.Add(this.current, new NamedHelp(placeholder, text, this.current.AllowedValues));
+                this.help.ValuePlaceholder = valuePlaceholder;
+                this.help.Description = description;
 
                 return this;
             }
 
-            public INamedSyntax Required()
+            public INamedSyntax<T> Required()
             {
-                this.required.Add(this.current);
+                this.addToRequired(this.current);
 
                 return this;
             }
 
-            public INamedSyntax RestrictedTo(params string[] allowedValues)
+            public INamedSyntax<T> RestrictedTo(params T[] allowedValues)
             {
-                this.current.AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues);
+                this.current.AllowedValues = Optional<IEnumerable<T>>.CreateSet(allowedValues);
 
                 return this;
             }
         }
 
-        private class UnnamedArgumentComposer : Composer, IUnnamedSyntax
+        private class UnnamedArgumentComposer<T> : Composer, IUnnamedSyntax
         {
-            private Dictionary<IArgument, Help> help;
-            private List<IArgument> required;
-            private UnnamedArgument current;
+            private readonly Action<Argument> addToRequired;
+
+            private readonly UnnamedArgument<T> current;
+            private readonly UnnamedHelp<T> help;
 
             public UnnamedArgumentComposer(
-                Action<string> callback,
+                Action<T> callback,
                 CommandLineParserConfigurator configurator,
-                List<Argument> arguments,
-                Dictionary<IArgument, Help> help,
-                List<IArgument> required)
+                Action<Argument> addToArguments,
+                Action<Argument> addToRequired,
+                Action<Help.Help> addToHelp)
                 : base(configurator)
             {
-                this.help = help;
-                this.required = required;
+                this.addToRequired = addToRequired;
 
-                this.current = new UnnamedArgument(callback);
-                arguments.Add(this.current);
+                this.current = new UnnamedArgument<T>(callback);
+                this.help = new UnnamedHelp<T>(this.current);
+
+                addToArguments(this.current);
+                addToHelp(this.help);
             }
 
-            public IUnnamedSyntax DescribedBy(string placeholder, string text)
+            public IUnnamedSyntax DescribedBy(string placeholder, string description)
             {
-                this.help.Add(this.current, new UnnamedHelp(placeholder, text));
+                this.help.Placeholder = placeholder;
+                this.help.Description = description;
 
                 return this;
             }
 
             public IUnnamedSyntax Required()
             {
-                this.required.Add(this.current);
+                this.addToRequired(this.current);
 
                 return this;
             }
@@ -170,36 +255,39 @@ namespace Appccelerate.CommandLineParser
 
         private class SwitchComposer : Composer, ISwitchSyntax
         {
-            private Dictionary<IArgument, Help> help;
-            private Dictionary<string, IArgumentWithName> longAliases;
-            private Switch current;
+            private readonly Action<string, IArgumentWithName> addLongAlias;
+
+            private readonly Switch current;
+            private readonly SwitchHelp help;
 
             public SwitchComposer(
                 string name,
                 Action callback,
                 CommandLineParserConfigurator configurator,
-                List<Argument> arguments,
-                Dictionary<string, IArgumentWithName> longAliases,
-                Dictionary<IArgument, Help> help)
+                Action<Argument> addToArguments,
+                Action<string, IArgumentWithName> addLongAlias,
+                Action<Help.Help> addHelp)
                 : base(configurator)
             {
-                this.help = help;
-                this.longAliases = longAliases;
+                this.addLongAlias = addLongAlias;
 
                 this.current = new Switch(name, callback);
-                arguments.Add(this.current);
+                this.help = new SwitchHelp(this.current);
+
+                addToArguments(this.current);
+                addHelp(this.help);
             }
 
             public ISwitchSyntax HavingLongAlias(string longAlias)
             {
-                this.longAliases.Add(longAlias, this.current);
+                this.addLongAlias(longAlias, this.current);
 
                 return this;
             }
 
-            public IConfigurationSyntax DescribedBy(string text)
+            public IConfigurationSyntax DescribedBy(string description)
             {
-                this.help.Add(this.current, new SwitchHelp(text));
+                this.help.Description = description;
 
                 return this;
             }
@@ -219,7 +307,17 @@ namespace Appccelerate.CommandLineParser
                 return this.configurator.WithUnnamed(callback);
             }
 
-            public INamedSyntax WithNamed(string name, Action<string> callback)
+            public IUnnamedSyntax WithUnnamed<T>(Action<T> callback)
+            {
+                return this.configurator.WithUnnamed(callback);
+            }
+
+            public INamedSyntax<string> WithNamed(string name, Action<string> callback)
+            {
+                return this.configurator.WithNamed(name, callback);
+            }
+
+            public INamedSyntax<T> WithNamed<T>(string name, Action<T> callback)
             {
                 return this.configurator.WithNamed(name, callback);
             }
@@ -240,27 +338,31 @@ namespace Appccelerate.CommandLineParser
     {
         IUnnamedSyntax WithUnnamed(Action<string> callback);
 
-        INamedSyntax WithNamed(string name, Action<string> callback);
+        IUnnamedSyntax WithUnnamed<T>(Action<T> callback);
+
+        INamedSyntax<string> WithNamed(string name, Action<string> callback);
+
+        INamedSyntax<T> WithNamed<T>(string name, Action<T> callback);
 
         ISwitchSyntax WithSwitch(string name, Action callback);
 
         CommandLineConfiguration BuildConfiguration();
     }
 
-    public interface INamedSyntax : IConfigurationSyntax
+    public interface INamedSyntax<T> : IConfigurationSyntax
     {
-        INamedSyntax HavingLongAlias(string longAlias);
+        INamedSyntax<T> HavingLongAlias(string longAlias);
 
-        INamedSyntax DescribedBy(string placeholder, string text);
+        INamedSyntax<T> DescribedBy(string valuePlaceholder, string description);
 
-        INamedSyntax Required();
+        INamedSyntax<T> Required();
 
-        INamedSyntax RestrictedTo(params string[] allowedValues);
+        INamedSyntax<T> RestrictedTo(params T[] allowedValues);
     }
 
     public interface IUnnamedSyntax : IConfigurationSyntax
     {
-        IUnnamedSyntax DescribedBy(string placeholder, string text);
+        IUnnamedSyntax DescribedBy(string placeholder, string description);
 
         IUnnamedSyntax Required();
     }
@@ -269,6 +371,6 @@ namespace Appccelerate.CommandLineParser
     {
         ISwitchSyntax HavingLongAlias(string longAlias);
 
-        IConfigurationSyntax DescribedBy(string text);
+        IConfigurationSyntax DescribedBy(string description);
     }
 }

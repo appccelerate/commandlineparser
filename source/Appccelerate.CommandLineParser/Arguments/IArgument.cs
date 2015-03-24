@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ISwitch.cs" company="Appccelerate">
+// <copyright file="IArgument.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,17 +16,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser
+namespace Appccelerate.CommandLineParser.Arguments
 {
-    using System;
-
-    public interface IArgumentWithName : IArgument
+    public interface IArgument
     {
-        string Name { get; }
-    }
-
-    public interface ISwitch : IArgument, IArgumentWithName
-    {
-        void Handle();
     }
 }

@@ -45,7 +45,7 @@ g";
   f
   g";
 
-            string result = Indenter.Indent(Original, 2);
+            string result = Original.IndentBy(2);
 
             result.Should().Be(Expected);
         }
@@ -53,7 +53,7 @@ g";
         [Fact]
         public void Indents_WhenEmptyInput()
         {
-            string result = Indenter.Indent(string.Empty, 2);
+            string result = string.Empty.IndentBy(2);
 
             result.Should().Be(string.Empty);
         }
@@ -61,7 +61,7 @@ g";
         [Fact]
         public void ThrowsArgumentException_WhenInputIsNull()
         {
-            Action act = () => Indenter.Indent(null, 2);
+            Action act = () => Indenter.IndentBy(null, 2);
 
             act.ShouldThrow<ArgumentNullException>();
         }

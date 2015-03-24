@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Describe.cs" company="Appccelerate">
+// <copyright file="SwitchHelp.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +16,30 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser
+namespace Appccelerate.CommandLineParser.Help
 {
-    public static class Describe
+    using System.Collections.Generic;
+    using System.Text;
+
+    using Appccelerate.CommandLineParser.Arguments;
+
+    public class SwitchHelp : Help<Switch>
     {
-        public static string CheckValues(params string[] allowedValues)
+        public SwitchHelp(Switch argument)
+            : base(argument)
         {
-            return string.Join("|", allowedValues);
+        }
+
+        public override void WriteArgumentTo(StringBuilder arguments)
+        {
+            arguments.AppendFormat("-{0}", this.Argument.Name);
+        }
+
+        public override void WriteOptionTo(IEnumerable<string> longAliases, StringBuilder options)
+        {
+            string aliasPart = this.GetAliasPart(longAliases);
+
+            options.AppendFormat("-{0}{1}\t{2}", this.Argument.Name, aliasPart, this.Description);
         }
     }
 }

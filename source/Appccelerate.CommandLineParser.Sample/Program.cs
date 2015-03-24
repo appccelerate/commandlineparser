@@ -27,10 +27,12 @@ namespace Appccelerate.CommandLineParser.Sample
             const string ShortOutput = "short";
             const string LongOutput = "long";
 
+            // set default values here
             string output = null;
             bool debug = false;
             string path = null;
             string value = null;
+            int threshold = 0;
 
             var configuration = CommandLineParserConfigurator
                 .Create()
@@ -39,9 +41,9 @@ namespace Appccelerate.CommandLineParser.Sample
                         .Required()
                         .RestrictedTo(ShortOutput, LongOutput)
                         .DescribedBy("method", "specifies the output method.")
-                    .WithNamed("m", v => output = v)
-                        .HavingLongAlias("message")
-                        .DescribedBy("message", "specifies the message to output.")
+                    .WithNamed("t", (int v) => threshold = v)
+                        .HavingLongAlias("threshold")
+                        .DescribedBy("value", "specifies the threshold used in output.")
                     .WithSwitch("d", () => debug = true)
                         .HavingLongAlias("debug")
                         .DescribedBy("enables debug mode")
@@ -68,7 +70,7 @@ namespace Appccelerate.CommandLineParser.Sample
                 return;
             }
 
-            Console.WriteLine("parsed successfully: path = " + path + ", output = " + output + ", debug = " + debug);
+            Console.WriteLine("parsed successfully: path = " + path + ", value = " + value + "output = " + output + ", debug = " + debug + ", threshold = " + threshold);
         }
     }
 }

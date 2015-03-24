@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Usage.cs" company="Appccelerate">
+// <copyright file="UnnamedArgument.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,29 +16,24 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser
+namespace Appccelerate.CommandLineParser.Arguments
 {
-    /// <summary>
-    /// You can use a Usage returned by the <see cref="UsageComposer"/> to write a help message to the console.
-    /// </summary>
-    /// <example>
-    ///     Usage usage = new UsageComposer(configuration).Compose();
-    ///     Console.WriteLine(parseResult.Message);
-    ///     Console.WriteLine("usage:" + usage.Arguments);
-    ///     Console.WriteLine("options");
-    ///     Console.WriteLine(usage.Options.IndentBy(4));
-    ///     Console.WriteLine();
-    /// </example>
-    public class Usage
+    using System;
+
+    public class UnnamedArgument<T> : Argument, IUnnamedArgument
     {
-        public Usage(string arguments, string options)
+        private readonly Action<T> callback;
+
+        public UnnamedArgument(Action<T> callback)
         {
-            this.Arguments = arguments;
-            this.Options = options;
+            this.callback = callback;
         }
 
-        public string Arguments { get; private set; }
+        public void Handle(string value)
+        {
+            T convertedValue = (T)Convert.ChangeType(value, typeof(T));
 
-        public string Options { get; private set; }
+            this.callback(convertedValue);
+        }
     }
 }

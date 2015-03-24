@@ -18,10 +18,21 @@
 
 namespace Appccelerate.CommandLineParser
 {
-    using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
 
+    /// <summary>
+    /// You can use the UsageComposer to create a help text.
+    /// </summary>
+    /// <example>
+    ///     Usage usage = new UsageComposer(configuration).Compose();
+    ///     Console.WriteLine(parseResult.Message);
+    ///     Console.WriteLine("usage:" + usage.Arguments);
+    ///     Console.WriteLine("options");
+    ///     Console.WriteLine(usage.Options.IndentBy(4));
+    ///     Console.WriteLine();
+    /// </example>
     public class UsageComposer
     {
         private readonly CommandLineConfiguration configuration;
@@ -41,10 +52,25 @@ namespace Appccelerate.CommandLineParser
         private string GetArguments()
         {
             StringBuilder arguments = new StringBuilder();
+            
+            foreach (Help.Help help in this.configuration.Help)
+            {
+                bool required = this.configuration.RequiredArguments.Contains(help.Argument);
 
-            this.AppendNamedArguments(arguments);
-            this.AppendSwitchArguments(arguments);
-            this.AppendUnnamedArguments(arguments);
+                if (!required)
+                {
+                    arguments.Append("[");
+                }
+
+                help.WriteArgumentTo(arguments);
+
+                if (!required)
+                {
+                    arguments.Append("]");
+                }
+
+                arguments.Append(" ");
+            }
 
             return arguments.ToString().TrimEnd();
         }
@@ -53,123 +79,16 @@ namespace Appccelerate.CommandLineParser
         {
             StringBuilder options = new StringBuilder();
 
-            this.AppendNamedOptions(options);
-            this.AppendSwitchOptions(options);
-            this.AppendUnnamedOptions(options);
+            foreach (Help.Help help in this.configuration.Help)
+            {
+                IEnumerable<string> longAliases = this.configuration.LongAliases
+                    .Where(x => x.Value == help.Argument)
+                    .Select(x => x.Key).ToList();
+                help.WriteOptionTo(longAliases, options);
+                options.AppendLine();
+            }
             
             return options.ToString();
-        }
-
-        private void AppendNamedArguments(StringBuilder arguments)
-        {
-            foreach (INamedArgument namedArgument in this.configuration.Arguments.OfType<INamedArgument>())
-            {
-                NamedHelp help = this.GetHelp<NamedHelp>(namedArgument);
-                if (this.configuration.RequiredArguments.Contains(namedArgument))
-                {
-                    arguments.AppendFormat("-{0} {1} ", namedArgument.Name, help.ValuePlaceholder);
-                }
-                else
-                {
-                    arguments.AppendFormat("[-{0} {1}] ", namedArgument.Name, help.ValuePlaceholder);
-                }
-            }
-        }
-
-        private void AppendSwitchArguments(StringBuilder arguments)
-        {
-            foreach (ISwitch switchArgument in this.configuration.Arguments.OfType<ISwitch>())
-            {
-                arguments.AppendFormat("[-{0}] ", switchArgument.Name);
-            }
-        }
-
-        private void AppendUnnamedArguments(StringBuilder arguments)
-        {
-            foreach (UnnamedArgument unnamedArgument in this.configuration.Arguments.OfType<IUnnamedArgument>())
-            {
-                var help = this.GetHelp<UnnamedHelp>(unnamedArgument);
-                if (this.configuration.RequiredArguments.Contains(unnamedArgument))
-                {
-                    arguments.AppendFormat("<{0}> ", help.Placeholder);
-                }
-                else
-                {
-                    arguments.AppendFormat("[<{0}>] ", help.Placeholder);
-                }
-            }
-        }
-
-        private void AppendNamedOptions(StringBuilder options)
-        {
-            foreach (INamedArgument namedArgument in this.configuration.Arguments.OfType<INamedArgument>())
-            {
-                NamedHelp help = this.GetHelp<NamedHelp>(namedArgument);
-                string aliasPart = this.GetAliasPart(namedArgument);
-                string placeholderPart = this.GetPlaceholderPart(namedArgument, help);
-
-                options.AppendFormat(
-                    "-{0} <{1}>{2}\t{3}{4}",
-                    namedArgument.Name,
-                    placeholderPart,
-                    aliasPart,
-                    help.Description,
-                    Environment.NewLine);
-            }
-        }
-
-        private string GetPlaceholderPart(INamedArgument namedArgument, NamedHelp help)
-        {
-            if (help.AllowedValues.IsSet)
-            {
-                return string.Format("{0} = {{ {1} }}", help.ValuePlaceholder, string.Join(" | ", help.AllowedValues.Value));
-            }
-            else
-            {
-                return string.Format("{0}", help.ValuePlaceholder);
-            }
-        }
-
-        private void AppendSwitchOptions(StringBuilder options)
-        {
-            foreach (ISwitch switchArgument in this.configuration.Arguments.OfType<ISwitch>())
-            {
-                SwitchHelp help = this.GetHelp<SwitchHelp>(switchArgument);
-                string aliasPart = this.GetAliasPart(switchArgument);
-
-                options.AppendFormat("-{0}{1}\t{2}{3}", switchArgument.Name, aliasPart, help.Description, Environment.NewLine);
-            }
-        }
-
-        private void AppendUnnamedOptions(StringBuilder options)
-        {
-            foreach (UnnamedArgument unnamedArgument in this.configuration.Arguments.OfType<IUnnamedArgument>())
-            {
-                var help = this.GetHelp<UnnamedHelp>(unnamedArgument);
-
-                options.AppendFormat("<{0}>\t{1}{2}", help.Placeholder, help.Description, Environment.NewLine);
-            }
-        }
-
-        private T GetHelp<T>(IArgument argument) where T : Help, new()
-        {
-            Help help;
-            T result = null;
-            if (this.configuration.Help.TryGetValue(argument, out help))
-            {
-                result = help as T;
-            }
-
-            return result ?? new T();
-        }
-
-        private string GetAliasPart(IArgument namedArgument)
-        {
-            string aliases = string.Join(
-                ", ",
-                this.configuration.LongAliases.Where(x => x.Value == namedArgument).Select(x => "--" + x.Key));
-
-            return aliases != string.Empty ? " (" + aliases + ")" : string.Empty;
         }
     }
 }

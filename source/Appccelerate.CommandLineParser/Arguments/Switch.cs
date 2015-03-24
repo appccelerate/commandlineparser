@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="INamedArgument.cs" company="Appccelerate">
+// <copyright file="Switch.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,26 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser
+namespace Appccelerate.CommandLineParser.Arguments
 {
-    public interface INamedArgument : IArgument, IArgumentWithName
+    using System;
+
+    public class Switch : Argument, ISwitch
     {
-        string Name { get; }
-        
-        void Handle(string value);
+        private readonly Action callback;
+
+        public Switch(string name, Action callback)
+        {
+            this.callback = callback;
+
+            this.Name = name;
+        }
+
+        public string Name { get; private set; }
+
+        public void Handle()
+        {
+            this.callback();
+        }
     }
 }

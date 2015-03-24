@@ -27,27 +27,48 @@ namespace Appccelerate.CommandLineParser.Specs
         [Scenario]
         public void UnknownArgument(
             string[] args,
-            ICommandLineParser parser,
-            ParseResult parseResult)
+            CommandLineConfiguration configuration,
+            UsageComposer usageComposer,
+            Usage usage)
         {
             "establish a parsing configuration"._(() =>
-            {
-                parser = CommandLineParserConfigurator
-                    .Create()
-                    .BuildParser();
-            });
+                {
+                    configuration = CommandLineParserConfigurator
+                        .Create()
+                            .WithNamed("optional", _)
+                                .DescribedBy("placeholder", "optional description")
+                            .WithNamed("required", _)
+                                .Required()
+                                .DescribedBy("placeholder", "required description")
+                        .BuildConfiguration();
+                });
 
-            "establish arguments with unknown argument"._(() =>
-                args = new[]
-                            {
-                                "-unknown"
-                            });
+            "establish a usage composer using the parsing configuration"._(() =>
+                {
+                    usageComposer = new UsageComposer(configuration);
+                });
 
-            "when parsing"._(() =>
-                parseResult = parser.Parse(args));
+            "when composing usage"._(() =>
+                usage = usageComposer.Compose());
 
-            "should parse unnamed argument"._(() =>
-                parseResult.Succeeded.Should().BeFalse());
+            "should list arguments"._(() =>
+                usage.Arguments
+                    .Should().Contain("-optional placeholder")
+                    .And.Contain("-required placeholder"));
+
+            "should show whether an argument is optional or required"._(() =>
+                (usage.Arguments + " ")
+                    .Should().Contain("[-optional placeholder]")
+                    .And.Contain(" -required placeholder "));
+
+            "should list options per argument with description"._(() =>
+                usage.Options
+                    .Should().Contain("optional description")
+                    .And.Contain("required description"));
+        }
+
+        private static void _(string value)
+        {
         }
     }
 }

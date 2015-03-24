@@ -21,6 +21,8 @@ namespace Appccelerate.CommandLineParser
     using System;
     using System.Linq;
 
+    using Appccelerate.CommandLineParser.Arguments;
+
     using FluentAssertions;
     using FluentAssertions.Execution;
     using FluentAssertions.Primitives;

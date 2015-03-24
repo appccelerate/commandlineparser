@@ -20,13 +20,20 @@ namespace Appccelerate.CommandLineParser
 {
     using System.Collections.Generic;
 
+    using Appccelerate.CommandLineParser.Arguments;
+
+    /// <summary>
+    /// Use the <see cref="CommandLineParserConfigurator"/> to create a<see cref="CommandLineConfiguration"/> 
+    /// and pass it to a <see cref="CommandLineParser"/> for parsing 
+    /// and a <see cref="UsageComposer"/> to compose a help message in case of a parsing error.
+    /// </summary>
     public class CommandLineConfiguration
     {
         public CommandLineConfiguration(
             IEnumerable<IArgument> arguments, 
             IDictionary<string, IArgumentWithName> longAliases,
             IEnumerable<IArgument> requiredArguments,
-            IDictionary<IArgument, Help> help)
+            IEnumerable<Help.Help> help)
         {
             this.Arguments = arguments;
             this.LongAliases = longAliases;
@@ -40,6 +47,6 @@ namespace Appccelerate.CommandLineParser
 
         public IEnumerable<IArgument> RequiredArguments { get; private set; }
 
-        public IDictionary<IArgument, Help> Help { get; private set; }
+        public IEnumerable<Help.Help> Help { get; private set; }
     }
 }

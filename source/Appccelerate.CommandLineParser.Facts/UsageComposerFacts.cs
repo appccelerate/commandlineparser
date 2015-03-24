@@ -21,6 +21,9 @@ namespace Appccelerate.CommandLineParser
     using System;
     using System.Collections.Generic;
 
+    using Appccelerate.CommandLineParser.Arguments;
+    using Appccelerate.CommandLineParser.Help;
+
     using FluentAssertions;
 
     using Xunit;
@@ -33,14 +36,14 @@ namespace Appccelerate.CommandLineParser
         
         private readonly Dictionary<string, IArgumentWithName> longAliases;
         private readonly List<IArgument> requiredArguments;
-        private readonly Dictionary<IArgument, Help> help;
+        private readonly List<Help.Help> help;
 
         public UsageComposerFacts()
         {
             this.arguments = new List<IArgument>();
             this.requiredArguments = new List<IArgument>();
             this.longAliases = new Dictionary<string, IArgumentWithName>();
-            this.help = new Dictionary<IArgument, Help>();
+            this.help = new List<Help.Help>();
 
             var configuration = new CommandLineConfiguration(
                 this.arguments,
@@ -52,7 +55,7 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
-        public void ComposesArgumentsForNamedArguments()
+        public void ComposesArgumentsForOptionalNamedArguments()
         {
             this.AddNamedArgument("name", "placeholder", null, Optional<IEnumerable<string>>.CreateNotSet());
 
@@ -64,7 +67,7 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void ComposesArgumentsForRequiredNamedArguments()
         {
-            NamedArgument namedArgument = this.AddNamedArgument("name", "placeholder", null, Optional<IEnumerable<string>>.CreateNotSet());
+            NamedArgument<string> namedArgument = this.AddNamedArgument("name", "placeholder", null, Optional<IEnumerable<string>>.CreateNotSet());
             this.requiredArguments.Add(namedArgument);
 
             Usage result = this.testee.Compose();
@@ -73,29 +76,7 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
-        public void ComposesArgumentsForNamedArguments_WhenNoHelpWasSpecified()
-        {
-            this.arguments.Add(new NamedArgument("name", _));
-
-            Usage result = this.testee.Compose();
-
-            result.Arguments.Should().Be("[-name value]");
-        }
-
-        [Fact]
-        public void ComposesArgumentsForRequiredNamedArguments_WhenNoHelpWasSpecified()
-        {
-            var namedArgument = new NamedArgument("name", _);
-            this.arguments.Add(namedArgument);
-            this.requiredArguments.Add(namedArgument);
-
-            Usage result = this.testee.Compose();
-
-            result.Arguments.Should().Be("-name value");
-        }
-
-        [Fact]
-        public void ComposesArgumentsForUnnamedArguments()
+        public void ComposesArgumentsForOptionalUnnamedArguments()
         {
             this.AddUnnamedArgument("placeholder", null);
 
@@ -107,34 +88,12 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void ComposesArgumentsForRequiredUnnamedNamedArguments()
         {
-            UnnamedArgument unnamedArgument = this.AddUnnamedArgument("placeholder", null);
+            UnnamedArgument<string> unnamedArgument = this.AddUnnamedArgument("placeholder", null);
             this.requiredArguments.Add(unnamedArgument);
 
             Usage result = this.testee.Compose();
 
             result.Arguments.Should().Be("<placeholder>");
-        }
-
-        [Fact]
-        public void ComposesArgumentsForUnnamedArguments_WhenNoHelpWasSpecified()
-        {
-            this.arguments.Add(new UnnamedArgument(_));
-
-            Usage result = this.testee.Compose();
-
-            result.Arguments.Should().Be("[<value>]");
-        }
-
-        [Fact]
-        public void ComposesArgumentsForRequiredUnnamedNamedArguments_WhenNoHelpWasSpecified()
-        {
-            UnnamedArgument unnamedArgument = new UnnamedArgument(_);
-            this.requiredArguments.Add(unnamedArgument);
-            this.arguments.Add(unnamedArgument);
-
-            Usage result = this.testee.Compose();
-
-            result.Arguments.Should().Be("<value>");
         }
 
         [Fact]
@@ -160,7 +119,7 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void ComposesOptionsForNamedArguments_WithAlias()
         {
-            NamedArgument namedArgument = this.AddNamedArgument("name", "placeholder", "description", Optional<IEnumerable<string>>.CreateNotSet());
+            NamedArgument<string> namedArgument = this.AddNamedArgument("name", "placeholder", "description", Optional<IEnumerable<string>>.CreateNotSet());
             this.longAliases.Add("alias", namedArgument);
             this.longAliases.Add("other_alias", namedArgument);
 
@@ -196,7 +155,7 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void ComposesOptionsForRequiredUnamedArguments()
         {
-            UnnamedArgument unnamedArgument = this.AddUnnamedArgument("placeholder", "description");
+            UnnamedArgument<string> unnamedArgument = this.AddUnnamedArgument("placeholder", "description");
             this.requiredArguments.Add(unnamedArgument);
 
             Usage result = this.testee.Compose();
@@ -227,65 +186,63 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
-        public void ComposesOptionsForSeveralArguments()
+        public void ComposesArgumentsForSeveralArgumentsInOrderOfDeclaration()
+        {
+            var namedArgument = this.AddNamedArgument("named", "value", "description_named", Optional<IEnumerable<string>>.CreateNotSet());
+            this.AddUnnamedArgument("placeholder", "description_unnamed");
+            this.AddSwitch("switch", "description_switch");
+            this.AddNamedArgument("other", "other", "description_other", Optional<IEnumerable<string>>.CreateNotSet());
+            this.requiredArguments.Add(namedArgument);
+
+            Usage result = this.testee.Compose();
+            result.Arguments.Should().Be("-named value [<placeholder>] [-switch] [-other other]");
+        }
+
+        [Fact]
+        public void ComposesOptionsForSeveralArgumentsInOrderOfDeclaration()
         {
             this.AddNamedArgument("named", "value", "description_named", Optional<IEnumerable<string>>.CreateNotSet());
             this.AddUnnamedArgument("placeholder", "description_unnamed");
             this.AddSwitch("switch", "description_switch");
+            this.AddNamedArgument("other", "other", "description_other", Optional<IEnumerable<string>>.CreateNotSet());
 
             Usage result = this.testee.Compose();
 
             result.Options.Should().Be(Lines(
                 "-named <value>\tdescription_named",
+                "<placeholder>\tdescription_unnamed",
                 "-switch\tdescription_switch",
-                "<placeholder>\tdescription_unnamed"));
+                "-other <other>\tdescription_other"));
         }
 
-        [Fact]
-        public void ComposesOptionsForNamedArguments_WhenNoHelpWasSpecified()
+        private NamedArgument<string> AddNamedArgument(string name, string valuePlaceholder, string description, Optional<IEnumerable<string>> allowedValues)
         {
-            this.arguments.Add(new NamedArgument("name", _));
-
-            Usage result = this.testee.Compose();
-
-            result.Options.Should().Be(Lines("-name <value>\t"));
-        }
-
-        [Fact]
-        public void ComposesOptionsForSwitches_WhenNoHelpWasSpecified()
-        {
-            var switchArgument = new Switch("switch", _);
-            this.arguments.Add(switchArgument);
-
-            Usage result = this.testee.Compose();
-
-            result.Options.Should().Be(Lines("-switch\t"));
-        }
-
-        [Fact]
-        public void ComposesOptionsForUnamedArguments_WhenNoHelpWasSpecified()
-        {
-            this.arguments.Add(new UnnamedArgument(_));
-
-            Usage result = this.testee.Compose();
-
-            result.Options.Should().Be(Lines("<value>\t"));
-        }
-
-        private NamedArgument AddNamedArgument(string name, string valuePlaceholder, string description, Optional<IEnumerable<string>> allowedValues)
-        {
-            var namedArgument = new NamedArgument(name, _);
+            var namedArgument = new NamedArgument<string>(name, _)
+                                    {
+                                        AllowedValues = allowedValues
+                                    };
+            var namedHelp = new NamedHelp<string>(namedArgument)
+                                      {
+                                          ValuePlaceholder = valuePlaceholder,
+                                          Description = description
+                                      };
             this.arguments.Add(namedArgument);
-            this.help.Add(namedArgument, new NamedHelp(valuePlaceholder, description, allowedValues));
+            this.help.Add(namedHelp);
 
             return namedArgument;
         }
 
-        private UnnamedArgument AddUnnamedArgument(string placeholder, string description)
+        private UnnamedArgument<string> AddUnnamedArgument(string placeholder, string description)
         {
-            var unnamedArgument = new UnnamedArgument(_);
+            var unnamedArgument = new UnnamedArgument<string>(_);
+            var unnamedHelp = new UnnamedHelp<string>(unnamedArgument)
+                                  {
+                                      Placeholder = placeholder,
+                                      Description = description
+                                  };
+            
             this.arguments.Add(unnamedArgument);
-            this.help.Add(unnamedArgument, new UnnamedHelp(placeholder, description));
+            this.help.Add(unnamedHelp);
 
             return unnamedArgument;
         }
@@ -293,8 +250,13 @@ namespace Appccelerate.CommandLineParser
         private Switch AddSwitch(string name, string description)
         {
             var switchArgument = new Switch(name, _);
+            var switchHelp = new SwitchHelp(switchArgument)
+                                 {
+                                     Description = description
+                                 };
+            
             this.arguments.Add(switchArgument);
-            this.help.Add(switchArgument, new SwitchHelp(description));
+            this.help.Add(switchHelp);
 
             return switchArgument;
         }

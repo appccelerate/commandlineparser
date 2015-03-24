@@ -43,13 +43,13 @@ namespace Appccelerate.CommandLineParser.Specs
                                FirstArgument, SecondArgument
                            });
 
-            "establish a parsing configuration"._(() =>
+            "establish a parser with parsing configuration for unnamed arguments"._(() =>
                 {
-                    parser = CommandLineParserConfigurator
+                    parser = new CommandLineParser(CommandLineParserConfigurator
                         .Create()
-                        .WithUnnamed(v => firstParsedArgument = v)
-                        .WithUnnamed(v => secondParsedArgument = v)
-                        .BuildParser();
+                            .WithUnnamed(v => firstParsedArgument = v)
+                            .WithUnnamed(v => secondParsedArgument = v)
+                        .BuildConfiguration());
                 });
 
             "when parsing"._(() =>
@@ -81,13 +81,13 @@ namespace Appccelerate.CommandLineParser.Specs
                                "-" + FirstName, FirstValue, "-" + SecondName, SecondValue
                            });
 
-            "establish a parsing configuration"._(() =>
+            "establish a parser with parsing configuration for named arguments"._(() =>
             {
-                parser = CommandLineParserConfigurator
+                parser = new CommandLineParser(CommandLineParserConfigurator
                     .Create()
-                    .WithNamed(FirstName, v => firstParsedArgument = v)
-                    .WithNamed(SecondName, v => secondParsedArgument = v)
-                    .BuildParser();
+                        .WithNamed(FirstName, v => firstParsedArgument = v)
+                        .WithNamed(SecondName, v => secondParsedArgument = v)
+                    .BuildConfiguration());
             });
 
             "when parsing"._(() =>
@@ -114,13 +114,15 @@ namespace Appccelerate.CommandLineParser.Specs
                                "-firstSwitch", "-secondSwitch"
                            });
 
-            "establish a parsing configuration for switches"._(() =>
+            "establish a parser with parsing configuration for switches"._(() =>
             {
-                parser = CommandLineParserConfigurator
+                CommandLineConfiguration configuration = CommandLineParserConfigurator
                     .Create()
                     .WithSwitch("firstSwitch", () => firstParsedSwitch = true)
                     .WithSwitch("secondSwitch", () => secondParsedSwitch = "yeah")
-                    .BuildParser();
+                    .BuildConfiguration();
+
+                parser = new CommandLineParser(configuration);
             });
 
             "when parsing"._(() =>
@@ -154,15 +156,15 @@ namespace Appccelerate.CommandLineParser.Specs
                                "-" + FirstName, FirstValue, "-" + SecondName, SecondValue
                            });
 
-            "establish a parsing configuration with required "._(() =>
+            "establish a parsing configuration with required named arguments "._(() =>
             {
-                parser = CommandLineParserConfigurator
+                parser = new CommandLineParser(CommandLineParserConfigurator
                     .Create()
-                    .WithNamed(RequiredName, v => { })
-                        .Required()
-                    .WithNamed(FirstName, v => { })
-                    .WithNamed(SecondName, v => { })
-                    .BuildParser();
+                        .WithNamed(RequiredName, v => { })
+                            .Required()
+                        .WithNamed(FirstName, v => { })
+                        .WithNamed(SecondName, v => { })
+                    .BuildConfiguration());
             });
 
             "when parsing"._(() =>
@@ -185,21 +187,21 @@ namespace Appccelerate.CommandLineParser.Specs
             const string SecondName = "secondName";
             const string SecondValue = "secondValue";
 
-            "establish some arguments with missing required argument"._(() =>
+            "establish some arguments with missing required unnamed argument"._(() =>
                 args = new[]
                            {
                                "-" + FirstName, FirstValue, "-" + SecondName, SecondValue
                            });
 
-            "establish a parsing configuration with required "._(() =>
+            "establish a parser with parsing configuration with required unnamed arguments"._(() =>
             {
-                parser = CommandLineParserConfigurator
+                parser = new CommandLineParser(CommandLineParserConfigurator
                     .Create()
-                    .WithUnnamed(v => { })
-                        .Required()
-                    .WithNamed(FirstName, v => { })
-                    .WithNamed(SecondName, v => { })
-                    .BuildParser();
+                        .WithUnnamed(v => { })
+                            .Required()
+                        .WithNamed(FirstName, v => { })
+                        .WithNamed(SecondName, v => { })
+                    .BuildConfiguration());
             });
 
             "when parsing"._(() =>
@@ -227,15 +229,15 @@ namespace Appccelerate.CommandLineParser.Specs
                                "-" + Name, ShortValue, "--" + LongAlias, LongAliasValue
                            });
 
-            "establish a parsing configuration"._(() =>
+            "establish a parser with parsing configuration with long aliases"._(() =>
             {
-                parser = CommandLineParserConfigurator
+                parser = new CommandLineParser(CommandLineParserConfigurator
                     .Create()
                         .WithNamed(Name, v => nameParsedArgument = v)
                             .HavingLongAlias("_")
                         .WithNamed("_", v => longAliasParsedArgument = v)
                             .HavingLongAlias(LongAlias)
-                    .BuildParser();
+                    .BuildConfiguration());
             });
 
             "when parsing"._(() =>
@@ -262,15 +264,15 @@ namespace Appccelerate.CommandLineParser.Specs
                                "-f", "--secondSwitch"
                            });
 
-            "establish a parsing configuration for switches"._(() =>
+            "establish a parser with parsing configuration for switches with long aliases"._(() =>
             {
-                parser = CommandLineParserConfigurator
+                parser = new CommandLineParser(CommandLineParserConfigurator
                     .Create()
                     .WithSwitch("f", () => firstParsedSwitch = true)
                         .HavingLongAlias("firstSwitch")
                     .WithSwitch("s", () => secondParsedSwitch = "yeah")
                         .HavingLongAlias("secondSwitch")
-                    .BuildParser();
+                    .BuildConfiguration());
             });
 
             "when parsing"._(() =>
@@ -302,13 +304,13 @@ namespace Appccelerate.CommandLineParser.Specs
                                "-n", value
                            });
 
-            "establish a parsing configuration with value check"._(() =>
+            "establish a parser with parsing configuration with value check"._(() =>
             {
-                parser = CommandLineParserConfigurator
+                parser = new CommandLineParser(CommandLineParserConfigurator
                     .Create()
                         .WithNamed("n", v => parsedValue = v)
                             .RestrictedTo(KnownValue)
-                    .BuildParser();
+                    .BuildConfiguration());
             });
 
             "when parsing"._(() =>
@@ -319,6 +321,40 @@ namespace Appccelerate.CommandLineParser.Specs
 
             "should fail for not allowed values"._(() =>
                 parseResult.Succeeded.Should().Be(expectedSuccessful));
+        }
+
+        [Scenario]
+        public void ValueConvertion(
+            string[] args,
+            int firstParsedArgument,
+            bool secondParsedArgument,
+            ICommandLineParser parser)
+        {
+            const int Value = 42;
+
+            "establish non-string arguments"._(() =>
+                args = new[]
+                           {
+                               "-value", Value.ToString(), "true"
+                           });
+
+            "establish a parser with parsing configuration with type convertion"._(() =>
+            {
+                parser = new CommandLineParser(CommandLineParserConfigurator
+                    .Create()
+                        .WithNamed("value", (int v) => firstParsedArgument = v)
+                        .WithUnnamed((bool v) => secondParsedArgument = v)
+                    .BuildConfiguration());
+            });
+
+            "when parsing"._(() =>
+                parser.Parse(args));
+
+            "should convert parsed named arguments"._(() =>
+                firstParsedArgument.Should().Be(Value));
+
+            "should convert parsed unnamed arguments"._(() =>
+                secondParsedArgument.Should().BeTrue());
         }
 
         [Scenario]
@@ -340,15 +376,23 @@ namespace Appccelerate.CommandLineParser.Specs
 
             "establish a parsing configuration"._(() =>
             {
-                parser = CommandLineParserConfigurator
+                var configuration = CommandLineParserConfigurator
                     .Create()
                         .WithNamed("firstName", s => firstNamedValue = s)
+                            .Required()
+                            .RestrictedTo("1n", "??")
+                            .DescribedBy("name", "the first name")
                         .WithSwitch("firstSwitch", () => firstParsedSwitch = true)
                         .WithUnnamed(x => firstUnnamedValue = x)
+                            .Required()
                         .WithSwitch("secondSwitch", () => secondParsedSwitch = "yeah")
+                            .HavingLongAlias("theOtherSwitch")
+                            .DescribedBy("the second switch")
                         .WithUnnamed(x => secondUnnamedValue = x)
                         .WithNamed("secondName", s => secondNamedValue = s)
-                    .BuildParser();
+                    .BuildConfiguration();
+
+                parser = new CommandLineParser(configuration);
             });
 
             "when parsing"._(() =>

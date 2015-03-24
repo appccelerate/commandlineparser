@@ -21,6 +21,65 @@ namespace Appccelerate.CommandLineParser
     using System.Collections.Generic;
     using System.Linq;
 
+    using Appccelerate.CommandLineParser.Arguments;
+    using Appccelerate.CommandLineParser.Errors;
+
+    /// <summary>
+    /// Parses command line arguments.
+    /// Use <see cref="CommandLineParserConfigurator"/> to create a <see cref="CommandLineConfiguration"/> that
+    /// can be used to create a <see cref="CommandLineParser"/>.
+    /// </summary>
+    /// <example>
+    /// <code>
+    ///        const string ShortOutput = "short";
+    ///        const string LongOutput = "long";
+    ///
+    ///        // set default values here
+    ///        string output = null;
+    ///        bool debug = false;
+    ///        string path = null;
+    ///        string value = null;
+    ///        int threshold = 0;
+    ///
+    ///        var configuration = CommandLineParserConfigurator
+    ///            .Create()
+    ///                .WithNamed("o", v => output = v)
+    ///                    .HavingLongAlias("output")
+    ///                    .Required()
+    ///                    .RestrictedTo(ShortOutput, LongOutput)
+    ///                    .DescribedBy("method", "specifies the output method.")
+    ///                .WithNamed("t", (int v) => threshold = v)
+    ///                    .HavingLongAlias("threshold")
+    ///                    .DescribedBy("value", "specifies the threshold used in output.")
+    ///                .WithSwitch("d", () => debug = true)
+    ///                    .HavingLongAlias("debug")
+    ///                    .DescribedBy("enables debug mode")
+    ///                .WithUnnamed(v => path = v)
+    ///                    .Required()
+    ///                    .DescribedBy("path", "path to the output file.")
+    ///                .WithUnnamed(v => value = v)
+    ///                    .DescribedBy("value", "some optional value.")
+    ///            .BuildConfiguration();
+    ///
+    ///        var parser = new CommandLineParser(configuration);
+    ///
+    ///        var parseResult = parser.Parse(args);
+    ///
+    ///        if (!parseResult.Succeeded)
+    ///        {
+    ///            Usage usage = new UsageComposer(configuration).Compose();
+    ///            Console.WriteLine(parseResult.Message);
+    ///            Console.WriteLine("usage:" + usage.Arguments);
+    ///            Console.WriteLine("options");
+    ///            Console.WriteLine(usage.Options.IndentBy(4));
+    ///            Console.WriteLine();
+    ///
+    ///            return;
+    ///        }
+    ///
+    ///        Console.WriteLine("parsed successfully: path = " + path + ", value = " + value + "output = " + output + ", debug = " + debug + ", threshold = " + threshold);
+    /// </code>
+    /// </example>
     public class CommandLineParser : ICommandLineParser
     {
         private readonly CommandLineConfiguration configuration;
@@ -111,7 +170,7 @@ namespace Appccelerate.CommandLineParser
 
                 if (argument == null)
                 {
-                    throw new ParseException(Errors.UnknownArgument(name));
+                    throw new ParseException(Errors.Errors.UnknownArgument(name));
                 }
 
                 this.HandleArgumentWithName(argument, name);
@@ -173,7 +232,7 @@ namespace Appccelerate.CommandLineParser
             {
                 if (!this.arguments.Any())
                 {
-                    throw new ParseException(Errors.NamedArgumentValueIsMissing(name));
+                    throw new ParseException(Errors.Errors.NamedArgumentValueIsMissing(name));
                 }
             }
 
@@ -181,7 +240,7 @@ namespace Appccelerate.CommandLineParser
             {
                 if (!this.unnamed.Any())
                 {
-                    throw new ParseException(Errors.TooManyUnnamedArguments);
+                    throw new ParseException(Errors.Errors.TooManyUnnamedArguments);
                 }
             }
 
@@ -189,7 +248,7 @@ namespace Appccelerate.CommandLineParser
             {
                 if (!this.longAliases.ContainsKey(longAlias))
                 {
-                    throw new ParseException(Errors.UnknownArgument(longAlias));
+                    throw new ParseException(Errors.Errors.UnknownArgument(longAlias));
                 }
             }
 
@@ -197,13 +256,13 @@ namespace Appccelerate.CommandLineParser
             {
                 if (this.required.Any())
                 {
-                    var namedArgument = this.required.First() as NamedArgument;
-                    if (namedArgument != null)
+                    var argumentWithName = this.required.First() as IArgumentWithName;
+                    if (argumentWithName != null)
                     {
-                        throw new ParseException(Errors.RequiredNamedArgumentIsMissing(namedArgument.Name));
+                        throw new ParseException(Errors.Errors.RequiredNamedArgumentIsMissing(argumentWithName.Name));
                     }
 
-                    throw new ParseException(Errors.RequiredUnnamedArgumentIsMissing);
+                    throw new ParseException(Errors.Errors.RequiredUnnamedArgumentIsMissing);
                 }
             }
         }

@@ -16,39 +16,43 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser
+namespace Appccelerate.CommandLineParser.Arguments
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    public class NamedArgument : Argument, INamedArgument
-    {
-        private readonly Action<string> callback;
+    using Appccelerate.CommandLineParser.Errors;
 
-        public NamedArgument(string shortName, Action<string> callback)
+    public class NamedArgument<T> : Argument, INamedArgument
+    {
+        private readonly Action<T> callback;
+
+        public NamedArgument(string shortName, Action<T> callback)
         {
             this.Name = shortName;
             this.callback = callback;
-            this.AllowedValues = Optional<IEnumerable<string>>.CreateNotSet();
+            this.AllowedValues = Optional<IEnumerable<T>>.CreateNotSet();
         }
 
         public string Name { get; private set; }
 
-        public Optional<IEnumerable<string>> AllowedValues { get; set; }
+        public Optional<IEnumerable<T>> AllowedValues { get; set; }
 
         public void Handle(string value)
         {
             this.CheckThatValueIsAllowed(value);
 
-            this.callback(value);
+            T convertedValue = (T)Convert.ChangeType(value, typeof(T));
+
+            this.callback(convertedValue);
         }
 
         private void CheckThatValueIsAllowed(string value)
         {
-            if (this.AllowedValues.IsSet && !this.AllowedValues.Value.Contains(value))
+            if (this.AllowedValues.IsSet && !this.AllowedValues.Value.Select(v => v.ToString()).Contains(value))
             {
-                throw new ParseException(Errors.ValueNotAllowed(value, this.AllowedValues.Value));
+                throw new ParseException(Errors.ValueNotAllowed(value, this.AllowedValues.Value.Select(v => v.ToString())));
             }
         }
     }

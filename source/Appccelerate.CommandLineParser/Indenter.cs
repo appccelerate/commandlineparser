@@ -20,9 +20,21 @@ namespace Appccelerate.CommandLineParser
 {
     using System;
 
+    /// <summary>
+    /// Use this class to indent lines of text.
+    /// </summary>
+    /// <example>
+    /// Writing the parsing error with usage to the console - with indented options:
+    ///     Usage usage = new UsageComposer(configuration).Compose();
+    ///     Console.WriteLine(parseResult.Message);
+    ///     Console.WriteLine("usage:" + usage.Arguments);
+    ///     Console.WriteLine("options");
+    ///     Console.WriteLine(usage.Options.IndentBy(4));
+    ///     Console.WriteLine();
+    /// </example>
     public static class Indenter
     {
-        public static string Indent(string lines, int indentation)
+        public static string IndentBy(this string lines, int indentation)
         {
             CheckLinesNotNull(lines);
 
@@ -34,11 +46,6 @@ namespace Appccelerate.CommandLineParser
             string spaces = string.Empty.PadLeft(indentation);
 
             return spaces + lines.Replace(Environment.NewLine, string.Concat(Environment.NewLine, spaces));
-        }
-
-        public static string IndentBy(this string lines, int indentation)
-        {
-            return Indent(lines, indentation);
         }
 
         private static void CheckLinesNotNull(string lines)

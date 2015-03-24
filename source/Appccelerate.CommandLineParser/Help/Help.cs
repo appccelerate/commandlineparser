@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Switch.cs" company="Appccelerate">
+// <copyright file="Help.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,26 +16,24 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser
+namespace Appccelerate.CommandLineParser.Help
 {
-    using System;
+    using System.Collections.Generic;
+    using System.Text;
 
-    public class Switch : Argument, ISwitch
+    using Appccelerate.CommandLineParser.Arguments;
+
+    public abstract class Help
     {
-        private readonly Action callback;
-
-        public Switch(string name, Action callback)
+        protected Help(Argument argument)
         {
-            this.callback = callback;
-
-            this.Name = name;
+            this.Argument = argument;
         }
 
-        public string Name { get; private set; }
+        public Argument Argument { get; private set; }
 
-        public void Handle()
-        {
-            this.callback();
-        }
+        public abstract void WriteArgumentTo(StringBuilder arguments);
+
+        public abstract void WriteOptionTo(IEnumerable<string> longAlias, StringBuilder options);
     }
 }

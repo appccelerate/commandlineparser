@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Argument.cs" company="Appccelerate">
+// <copyright file="ParseException.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +16,15 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser
+namespace Appccelerate.CommandLineParser.Errors
 {
-    public interface IArgument
-    {
-    }
+    using System;
 
-    public abstract class Argument : IArgument
+    public class ParseException : Exception
     {
+        public ParseException(string message)
+            : base(message)
+        {
+        }
     }
 }

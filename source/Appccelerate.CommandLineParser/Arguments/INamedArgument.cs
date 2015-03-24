@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICommandLineParser.cs" company="Appccelerate">
+// <copyright file="INamedArgument.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,10 +16,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser
+namespace Appccelerate.CommandLineParser.Arguments
 {
-    public interface ICommandLineParser
+    public interface INamedArgument : IArgumentWithName
     {
-        ParseResult Parse(string[] args);
+        void Handle(string value);
     }
 }
