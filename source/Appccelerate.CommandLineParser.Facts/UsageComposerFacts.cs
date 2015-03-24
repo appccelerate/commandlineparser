@@ -61,7 +61,7 @@ namespace Appccelerate.CommandLineParser
 
             Usage result = this.testee.Compose();
 
-            result.Arguments.Should().Be("[-name placeholder]");
+            result.Arguments.Should().Be("[-name <placeholder>]");
         }
 
         [Fact]
@@ -72,7 +72,7 @@ namespace Appccelerate.CommandLineParser
 
             Usage result = this.testee.Compose();
 
-            result.Arguments.Should().Be("-name placeholder");
+            result.Arguments.Should().Be("-name <placeholder>");
         }
 
         [Fact]
@@ -195,7 +195,7 @@ namespace Appccelerate.CommandLineParser
             this.requiredArguments.Add(namedArgument);
 
             Usage result = this.testee.Compose();
-            result.Arguments.Should().Be("-named value [<placeholder>] [-switch] [-other other]");
+            result.Arguments.Should().Be("-named <value> [<placeholder>] [-switch] [-other <other>]");
         }
 
         [Fact]

@@ -35,7 +35,7 @@ namespace Appccelerate.CommandLineParser.Help
 
         public override void WriteArgumentTo(StringBuilder arguments)
         {
-            arguments.AppendFormat("-{0} {1}", this.Argument.Name, this.ValuePlaceholder);
+            arguments.AppendFormat("-{0} <{1}>", this.Argument.Name, this.ValuePlaceholder);
         }
 
         public override void WriteOptionTo(IEnumerable<string> longAliases, StringBuilder options)

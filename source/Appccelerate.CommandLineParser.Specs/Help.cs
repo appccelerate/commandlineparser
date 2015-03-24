@@ -53,13 +53,13 @@ namespace Appccelerate.CommandLineParser.Specs
 
             "should list arguments"._(() =>
                 usage.Arguments
-                    .Should().Contain("-optional placeholder")
-                    .And.Contain("-required placeholder"));
+                    .Should().Contain("-optional <placeholder>")
+                    .And.Contain("-required <placeholder>"));
 
             "should show whether an argument is optional or required"._(() =>
                 (usage.Arguments + " ")
-                    .Should().Contain("[-optional placeholder]")
-                    .And.Contain(" -required placeholder "));
+                    .Should().Contain("[-optional <placeholder>]")
+                    .And.Contain(" -required <placeholder> "));
 
             "should list options per argument with description"._(() =>
                 usage.Options
