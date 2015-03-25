@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UnnamedArgument.cs" company="Appccelerate">
+// <copyright file="IPositionalArgument.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,22 +18,8 @@
 
 namespace Appccelerate.CommandLineParser.Arguments
 {
-    using System;
-
-    public class UnnamedArgument<T> : Argument, IUnnamedArgument
+    public interface IPositionalArgument : IArgument
     {
-        private readonly Action<T> callback;
-
-        public UnnamedArgument(Action<T> callback)
-        {
-            this.callback = callback;
-        }
-
-        public void Handle(string value)
-        {
-            T convertedValue = (T)Convert.ChangeType(value, typeof(T));
-
-            this.callback(convertedValue);
-        }
+        void Handle(string value);
     }
 }

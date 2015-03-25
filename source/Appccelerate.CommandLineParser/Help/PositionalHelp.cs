@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UnnamedHelp.cs" company="Appccelerate">
+// <copyright file="PositionalHelp.cs" company="Appccelerate">
 //   Copyright (c) 2008-2015
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,9 +23,9 @@ namespace Appccelerate.CommandLineParser.Help
 
     using Appccelerate.CommandLineParser.Arguments;
 
-    public class UnnamedHelp<T> : Help<UnnamedArgument<T>>
+    public class PositionalHelp<T> : Help<PositionalArgument<T>>
     {
-        public UnnamedHelp(UnnamedArgument<T> argument)
+        public PositionalHelp(PositionalArgument<T> argument)
             : base(argument)
         {
             this.Placeholder = "value";

@@ -28,7 +28,7 @@ namespace Appccelerate.CommandLineParser.Specs
         const string UnknownValue = "unknown";
 
         [Scenario]
-        public void UnnamedArguments(
+        public void PositionalArguments(
             string[] args,
             string firstParsedArgument,
             string secondParsedArgument,
@@ -37,25 +37,25 @@ namespace Appccelerate.CommandLineParser.Specs
             const string FirstArgument = "firstArgument";
             const string SecondArgument = "secondArgument";
 
-            "establish unnamed arguments"._(() =>
+            "establish positional arguments"._(() =>
                 args = new[]
                            {
                                FirstArgument, SecondArgument
                            });
 
-            "establish a parser with parsing configuration for unnamed arguments"._(() =>
+            "establish a parser with parsing configuration for positional arguments"._(() =>
                 {
                     parser = new CommandLineParser(CommandLineParserConfigurator
                         .Create()
-                            .WithUnnamed(v => firstParsedArgument = v)
-                            .WithUnnamed(v => secondParsedArgument = v)
+                            .WithPositional(v => firstParsedArgument = v)
+                            .WithPositional(v => secondParsedArgument = v)
                         .BuildConfiguration());
                 });
 
             "when parsing"._(() =>
                 parser.Parse(args));
 
-            "should parse unnamed argument"._(() =>
+            "should parse positional argument"._(() =>
                 new[]
                     {
                         firstParsedArgument, secondParsedArgument
@@ -175,7 +175,7 @@ namespace Appccelerate.CommandLineParser.Specs
         }
 
         [Scenario]
-        public void RequiredUnnamed(
+        public void RequiredPositional(
             string[] args,
             string firstParsedArgument,
             string secondParsedArgument,
@@ -187,17 +187,17 @@ namespace Appccelerate.CommandLineParser.Specs
             const string SecondName = "secondName";
             const string SecondValue = "secondValue";
 
-            "establish some arguments with missing required unnamed argument"._(() =>
+            "establish some arguments with missing required positional argument"._(() =>
                 args = new[]
                            {
                                "-" + FirstName, FirstValue, "-" + SecondName, SecondValue
                            });
 
-            "establish a parser with parsing configuration with required unnamed arguments"._(() =>
+            "establish a parser with parsing configuration with required positional arguments"._(() =>
             {
                 parser = new CommandLineParser(CommandLineParserConfigurator
                     .Create()
-                        .WithUnnamed(v => { })
+                        .WithPositional(v => { })
                             .Required()
                         .WithNamed(FirstName, v => { })
                         .WithNamed(SecondName, v => { })
@@ -343,7 +343,7 @@ namespace Appccelerate.CommandLineParser.Specs
                 parser = new CommandLineParser(CommandLineParserConfigurator
                     .Create()
                         .WithNamed("value", (int v) => firstParsedArgument = v)
-                        .WithUnnamed((bool v) => secondParsedArgument = v)
+                        .WithPositional((bool v) => secondParsedArgument = v)
                     .BuildConfiguration());
             });
 
@@ -353,7 +353,7 @@ namespace Appccelerate.CommandLineParser.Specs
             "should convert parsed named arguments"._(() =>
                 firstParsedArgument.Should().Be(Value));
 
-            "should convert parsed unnamed arguments"._(() =>
+            "should convert parsed positional arguments"._(() =>
                 secondParsedArgument.Should().BeTrue());
         }
 
@@ -364,8 +364,8 @@ namespace Appccelerate.CommandLineParser.Specs
             string secondParsedSwitch,
             string firstNamedValue,
             string secondNamedValue,
-            string firstUnnamedValue,
-            string secondUnnamedValue,
+            string firstPositionalValue,
+            string secondPositionalValue,
             ICommandLineParser parser)
         {
             "establish arguments"._(() =>
@@ -383,12 +383,12 @@ namespace Appccelerate.CommandLineParser.Specs
                             .RestrictedTo("1n", "??")
                             .DescribedBy("name", "the first name")
                         .WithSwitch("firstSwitch", () => firstParsedSwitch = true)
-                        .WithUnnamed(x => firstUnnamedValue = x)
+                        .WithPositional(x => firstPositionalValue = x)
                             .Required()
                         .WithSwitch("secondSwitch", () => secondParsedSwitch = "yeah")
                             .HavingLongAlias("theOtherSwitch")
                             .DescribedBy("the second switch")
-                        .WithUnnamed(x => secondUnnamedValue = x)
+                        .WithPositional(x => secondPositionalValue = x)
                         .WithNamed("secondName", s => secondNamedValue = s)
                     .BuildConfiguration();
 
@@ -401,7 +401,7 @@ namespace Appccelerate.CommandLineParser.Specs
             "should parse arguments"._(() =>
                 new object[]
                     {
-                        firstParsedSwitch, secondParsedSwitch, firstNamedValue, secondNamedValue, firstUnnamedValue, secondUnnamedValue
+                        firstParsedSwitch, secondParsedSwitch, firstNamedValue, secondNamedValue, firstPositionalValue, secondPositionalValue
                     }
                     .Should().Equal(true, "yeah", "1n", "2n", "1u", "2u"));
         }

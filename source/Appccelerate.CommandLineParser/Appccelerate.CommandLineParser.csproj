@@ -44,11 +44,11 @@
     <Compile Include="Arguments\IArgumentWithName.cs" />
     <Compile Include="Arguments\INamedArgument.cs" />
     <Compile Include="Arguments\ISwitch.cs" />
-    <Compile Include="Arguments\IUnnamedArgument.cs" />
+    <Compile Include="Arguments\IPositionalArgument.cs" />
     <Compile Include="Arguments\NamedArgument.cs" />
     <Compile Include="Arguments\Optional.cs" />
     <Compile Include="Arguments\Switch.cs" />
-    <Compile Include="Arguments\UnnamedArgument.cs" />
+    <Compile Include="Arguments\PositionalArgument.cs" />
     <Compile Include="CommandLineConfiguration.cs" />
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="CommandLineParserConfigurator.cs" />
@@ -58,7 +58,7 @@
     <Compile Include="Help\Help{T}.cs" />
     <Compile Include="Help\NamedHelp.cs" />
     <Compile Include="Help\SwitchHelp.cs" />
-    <Compile Include="Help\UnnamedHelp.cs" />
+    <Compile Include="Help\PositionalHelp.cs" />
     <Compile Include="ICommandLineParser.cs" />
     <Compile Include="Indenter.cs" />
     <Compile Include="ParseResult.cs" />

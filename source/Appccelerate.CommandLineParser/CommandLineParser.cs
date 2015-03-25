@@ -54,10 +54,10 @@ namespace Appccelerate.CommandLineParser
     ///                .WithSwitch("d", () => debug = true)
     ///                    .HavingLongAlias("debug")
     ///                    .DescribedBy("enables debug mode")
-    ///                .WithUnnamed(v => path = v)
+    ///                .WithPositional(v => path = v)
     ///                    .Required()
     ///                    .DescribedBy("path", "path to the output file.")
-    ///                .WithUnnamed(v => value = v)
+    ///                .WithPositional(v => value = v)
     ///                    .DescribedBy("value", "some optional value.")
     ///            .BuildConfiguration();
     ///
@@ -114,7 +114,7 @@ namespace Appccelerate.CommandLineParser
             private readonly Queue<string> arguments;
             private readonly IDictionary<string, IArgumentWithName> longAliases;
 
-            private readonly Queue<IUnnamedArgument> unnamed;
+            private readonly Queue<IPositionalArgument> positionalArguments;
 
             private readonly List<IArgument> required;
 
@@ -131,7 +131,7 @@ namespace Appccelerate.CommandLineParser
                 this.required = new List<IArgument>(requiredArguments);
                 this.longAliases = new Dictionary<string, IArgumentWithName>(longAliases);
 
-                this.unnamed = new Queue<IUnnamedArgument>(this.configuration.OfType<IUnnamedArgument>());
+                this.positionalArguments = new Queue<IPositionalArgument>(this.configuration.OfType<IPositionalArgument>());
             }
 
             public void Parse()
@@ -158,7 +158,7 @@ namespace Appccelerate.CommandLineParser
                 }
                 else
                 {
-                    this.HandleUnnamed(arg);
+                    this.HandlePositional(arg);
                 }
             }
 
@@ -218,14 +218,14 @@ namespace Appccelerate.CommandLineParser
                 switchArgument.Handle();
             }
 
-            private void HandleUnnamed(string arg)
+            private void HandlePositional(string arg)
             {
-                this.CheckThatThereIsAnUnnamedArgumentPending();
+                this.CheckThatThereIsAnPositionalArgumentPending();
 
-                IUnnamedArgument unnamedArgument = this.unnamed.Dequeue();
-                unnamedArgument.Handle(arg);
+                IPositionalArgument positionalArgument = this.positionalArguments.Dequeue();
+                positionalArgument.Handle(arg);
 
-                this.required.Remove(unnamedArgument);
+                this.required.Remove(positionalArgument);
             }
 
             private void CheckThatThereIsAValue(string name)
@@ -236,11 +236,11 @@ namespace Appccelerate.CommandLineParser
                 }
             }
 
-            private void CheckThatThereIsAnUnnamedArgumentPending()
+            private void CheckThatThereIsAnPositionalArgumentPending()
             {
-                if (!this.unnamed.Any())
+                if (!this.positionalArguments.Any())
                 {
-                    throw new ParseException(Errors.Errors.TooManyUnnamedArguments);
+                    throw new ParseException(Errors.Errors.TooManyPositionalArguments);
                 }
             }
 
@@ -262,7 +262,7 @@ namespace Appccelerate.CommandLineParser
                         throw new ParseException(Errors.Errors.RequiredNamedArgumentIsMissing(argumentWithName.Name));
                     }
 
-                    throw new ParseException(Errors.Errors.RequiredUnnamedArgumentIsMissing);
+                    throw new ParseException(Errors.Errors.RequiredPositionalArgumentIsMissing);
                 }
             }
         }

@@ -76,9 +76,9 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
-        public void ComposesArgumentsForOptionalUnnamedArguments()
+        public void ComposesArgumentsForOptionalPositionalArguments()
         {
-            this.AddUnnamedArgument("placeholder", null);
+            this.AddpositionalArgument("placeholder", null);
 
             Usage result = this.testee.Compose();
 
@@ -86,10 +86,10 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
-        public void ComposesArgumentsForRequiredUnnamedNamedArguments()
+        public void ComposesArgumentsForRequiredPositionalNamedArguments()
         {
-            UnnamedArgument<string> unnamedArgument = this.AddUnnamedArgument("placeholder", null);
-            this.requiredArguments.Add(unnamedArgument);
+            PositionalArgument<string> positionalArgument = this.AddpositionalArgument("placeholder", null);
+            this.requiredArguments.Add(positionalArgument);
 
             Usage result = this.testee.Compose();
 
@@ -145,7 +145,7 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void ComposesOptionsForUnamedArguments()
         {
-            this.AddUnnamedArgument("placeholder", "description");
+            this.AddpositionalArgument("placeholder", "description");
 
             Usage result = this.testee.Compose();
 
@@ -155,8 +155,8 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void ComposesOptionsForRequiredUnamedArguments()
         {
-            UnnamedArgument<string> unnamedArgument = this.AddUnnamedArgument("placeholder", "description");
-            this.requiredArguments.Add(unnamedArgument);
+            PositionalArgument<string> positionalArgument = this.AddpositionalArgument("placeholder", "description");
+            this.requiredArguments.Add(positionalArgument);
 
             Usage result = this.testee.Compose();
 
@@ -189,7 +189,7 @@ namespace Appccelerate.CommandLineParser
         public void ComposesArgumentsForSeveralArgumentsInOrderOfDeclaration()
         {
             var namedArgument = this.AddNamedArgument("named", "value", "description_named", Optional<IEnumerable<string>>.CreateNotSet());
-            this.AddUnnamedArgument("placeholder", "description_unnamed");
+            this.AddpositionalArgument("placeholder", "description_positional");
             this.AddSwitch("switch", "description_switch");
             this.AddNamedArgument("other", "other", "description_other", Optional<IEnumerable<string>>.CreateNotSet());
             this.requiredArguments.Add(namedArgument);
@@ -202,7 +202,7 @@ namespace Appccelerate.CommandLineParser
         public void ComposesOptionsForSeveralArgumentsInOrderOfDeclaration()
         {
             this.AddNamedArgument("named", "value", "description_named", Optional<IEnumerable<string>>.CreateNotSet());
-            this.AddUnnamedArgument("placeholder", "description_unnamed");
+            this.AddpositionalArgument("placeholder", "description_positional");
             this.AddSwitch("switch", "description_switch");
             this.AddNamedArgument("other", "other", "description_other", Optional<IEnumerable<string>>.CreateNotSet());
 
@@ -210,7 +210,7 @@ namespace Appccelerate.CommandLineParser
 
             result.Options.Should().Be(Lines(
                 "-named <value>\tdescription_named",
-                "<placeholder>\tdescription_unnamed",
+                "<placeholder>\tdescription_positional",
                 "-switch\tdescription_switch",
                 "-other <other>\tdescription_other"));
         }
@@ -232,19 +232,19 @@ namespace Appccelerate.CommandLineParser
             return namedArgument;
         }
 
-        private UnnamedArgument<string> AddUnnamedArgument(string placeholder, string description)
+        private PositionalArgument<string> AddpositionalArgument(string placeholder, string description)
         {
-            var unnamedArgument = new UnnamedArgument<string>(_);
-            var unnamedHelp = new UnnamedHelp<string>(unnamedArgument)
+            var positionalArgument = new PositionalArgument<string>(_);
+            var positionalHelp = new PositionalHelp<string>(positionalArgument)
                                   {
                                       Placeholder = placeholder,
                                       Description = description
                                   };
             
-            this.arguments.Add(unnamedArgument);
-            this.help.Add(unnamedHelp);
+            this.arguments.Add(positionalArgument);
+            this.help.Add(positionalHelp);
 
-            return unnamedArgument;
+            return positionalArgument;
         }
 
         private Switch AddSwitch(string name, string description)

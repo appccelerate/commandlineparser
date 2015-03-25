@@ -31,7 +31,6 @@ namespace Appccelerate.CommandLineParser
 
     using Switch = Appccelerate.CommandLineParser.Arguments.Switch;
 
-    // TODO: a callback throws an exception
     public class CommandLineParserFacts
     {
         private static readonly IEnumerable<IArgument> NoArguments = Enumerable.Empty<IArgument>();
@@ -40,20 +39,20 @@ namespace Appccelerate.CommandLineParser
         private static readonly IEnumerable<Help.Help> NoHelp = Enumerable.Empty<Help.Help>();
 
         [Fact]
-        public void ParsesUnnamedArguments()
+        public void ParsesPositionalArguments()
         {
             const string FirstArgument = "A";
             const string SecondArgument = "B";
 
             var parsedArguments = new string[2];
 
-            var unnamedArguments = new[]
+            var positionalArguments = new[]
                                        { 
-                                           new UnnamedArgument<string>(x => parsedArguments[0] = x), 
-                                           new UnnamedArgument<string>(x => parsedArguments[1] = x)
+                                           new PositionalArgument<string>(x => parsedArguments[0] = x), 
+                                           new PositionalArgument<string>(x => parsedArguments[1] = x)
                                        };
             var configuration = new CommandLineConfiguration(
-                unnamedArguments, 
+                positionalArguments, 
                 NoLongAliases, 
                 NoRequiredArguments,
                 NoHelp);
@@ -236,14 +235,14 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
-        public void Fails_WhenRequiredUnnamedArgumentIsMissing()
+        public void Fails_WhenRequiredPositionalArgumentIsMissing()
         {
-            var unnamedArgument = new UnnamedArgument<string>(v => { });
+            var positionalArgument = new PositionalArgument<string>(v => { });
 
             var configuration = new CommandLineConfiguration(
-                new[] { unnamedArgument }, 
+                new[] { positionalArgument }, 
                 NoLongAliases,
-                new[] { unnamedArgument },
+                new[] { positionalArgument },
                 NoHelp);
             var testee = new CommandLineParser(configuration);
 
@@ -251,16 +250,16 @@ namespace Appccelerate.CommandLineParser
 
             result.Should()
                 .BeFailedParsingResult()
-                    .WithMessage(Errors.Errors.RequiredUnnamedArgumentIsMissing);
+                    .WithMessage(Errors.Errors.RequiredPositionalArgumentIsMissing);
         }
 
         [Fact]
-        public void Succeeds_WhenRequiredUnnamedArgumentsArePresent()
+        public void Succeeds_WhenRequiredPositionalArgumentsArePresent()
         {
-            var unnamedArgument = new UnnamedArgument<string>(v => { });
+            var positionalArgument = new PositionalArgument<string>(v => { });
 
             var configuration = new CommandLineConfiguration(
-                new[] { unnamedArgument }, 
+                new[] { positionalArgument }, 
                 NoLongAliases,
                 NoRequiredArguments,
                 NoHelp);
@@ -272,7 +271,7 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
-        public void Fails_WhenTooManyUnnamedArguments()
+        public void Fails_WhenTooManyPositionalArguments()
         {
             var configuration = new CommandLineConfiguration(NoArguments, NoLongAliases, NoRequiredArguments, NoHelp);
             var testee = new CommandLineParser(configuration);
@@ -281,7 +280,7 @@ namespace Appccelerate.CommandLineParser
 
             result.Should()
                 .BeFailedParsingResult()
-                    .WithMessage(Errors.Errors.TooManyUnnamedArguments);
+                    .WithMessage(Errors.Errors.TooManyPositionalArguments);
         }
 
         [Fact]

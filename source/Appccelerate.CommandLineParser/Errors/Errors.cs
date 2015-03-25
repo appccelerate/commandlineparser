@@ -22,9 +22,9 @@ namespace Appccelerate.CommandLineParser.Errors
 
     public static class Errors
     {
-        public const string RequiredUnnamedArgumentIsMissing = "Required unnamed argument is missing";
+        public const string RequiredPositionalArgumentIsMissing = "Required positional argument is missing";
 
-        public const string TooManyUnnamedArguments = "Too many unnamed arguments.";
+        public const string TooManyPositionalArguments = "Too many positional arguments.";
 
         public static string NamedArgumentValueIsMissing(string name)
         {

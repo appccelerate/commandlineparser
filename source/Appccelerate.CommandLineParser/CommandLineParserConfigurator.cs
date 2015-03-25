@@ -53,10 +53,10 @@ namespace Appccelerate.CommandLineParser
     ///                .WithSwitch("d", () => debug = true)
     ///                    .HavingLongAlias("debug")
     ///                    .DescribedBy("enables debug mode")
-    ///                .WithUnnamed(v => path = v)
+    ///                .WithPositional(v => path = v)
     ///                    .Required()
     ///                    .DescribedBy("path", "path to the output file.")
-    ///                .WithUnnamed(v => value = v)
+    ///                .WithPositional(v => value = v)
     ///                    .DescribedBy("value", "some optional value.")
     ///            .BuildConfiguration();
     ///
@@ -91,9 +91,9 @@ namespace Appccelerate.CommandLineParser
             return new CommandLineParserConfigurator();
         }
 
-        public IUnnamedSyntax WithUnnamed(Action<string> callback)
+        public IPositionalSyntax WithPositional(Action<string> callback)
         {
-            return new UnnamedArgumentComposer<string>(
+            return new PositionalArgumentComposer<string>(
                 callback,
                 this,
                 a => this.arguments.Add(a),
@@ -101,9 +101,9 @@ namespace Appccelerate.CommandLineParser
                 h => this.help.Add(h));
         }
 
-        public IUnnamedSyntax WithUnnamed<T>(Action<T> callback)
+        public IPositionalSyntax WithPositional<T>(Action<T> callback)
         {
-            return new UnnamedArgumentComposer<T>(
+            return new PositionalArgumentComposer<T>(
                 callback,
                 this,
                 a => this.arguments.Add(a),
@@ -213,14 +213,14 @@ namespace Appccelerate.CommandLineParser
             }
         }
 
-        private class UnnamedArgumentComposer<T> : Composer, IUnnamedSyntax
+        private class PositionalArgumentComposer<T> : Composer, IPositionalSyntax
         {
             private readonly Action<Argument> addToRequired;
 
-            private readonly UnnamedArgument<T> current;
-            private readonly UnnamedHelp<T> help;
+            private readonly PositionalArgument<T> current;
+            private readonly PositionalHelp<T> help;
 
-            public UnnamedArgumentComposer(
+            public PositionalArgumentComposer(
                 Action<T> callback,
                 CommandLineParserConfigurator configurator,
                 Action<Argument> addToArguments,
@@ -230,14 +230,14 @@ namespace Appccelerate.CommandLineParser
             {
                 this.addToRequired = addToRequired;
 
-                this.current = new UnnamedArgument<T>(callback);
-                this.help = new UnnamedHelp<T>(this.current);
+                this.current = new PositionalArgument<T>(callback);
+                this.help = new PositionalHelp<T>(this.current);
 
                 addToArguments(this.current);
                 addToHelp(this.help);
             }
 
-            public IUnnamedSyntax DescribedBy(string placeholder, string description)
+            public IPositionalSyntax DescribedBy(string placeholder, string description)
             {
                 this.help.Placeholder = placeholder;
                 this.help.Description = description;
@@ -245,7 +245,7 @@ namespace Appccelerate.CommandLineParser
                 return this;
             }
 
-            public IUnnamedSyntax Required()
+            public IPositionalSyntax Required()
             {
                 this.addToRequired(this.current);
 
@@ -302,14 +302,14 @@ namespace Appccelerate.CommandLineParser
                 this.configurator = configurator;
             }
 
-            public IUnnamedSyntax WithUnnamed(Action<string> callback)
+            public IPositionalSyntax WithPositional(Action<string> callback)
             {
-                return this.configurator.WithUnnamed(callback);
+                return this.configurator.WithPositional(callback);
             }
 
-            public IUnnamedSyntax WithUnnamed<T>(Action<T> callback)
+            public IPositionalSyntax WithPositional<T>(Action<T> callback)
             {
-                return this.configurator.WithUnnamed(callback);
+                return this.configurator.WithPositional(callback);
             }
 
             public INamedSyntax<string> WithNamed(string name, Action<string> callback)
@@ -336,9 +336,9 @@ namespace Appccelerate.CommandLineParser
 
     public interface IConfigurationSyntax
     {
-        IUnnamedSyntax WithUnnamed(Action<string> callback);
+        IPositionalSyntax WithPositional(Action<string> callback);
 
-        IUnnamedSyntax WithUnnamed<T>(Action<T> callback);
+        IPositionalSyntax WithPositional<T>(Action<T> callback);
 
         INamedSyntax<string> WithNamed(string name, Action<string> callback);
 
@@ -360,11 +360,11 @@ namespace Appccelerate.CommandLineParser
         INamedSyntax<T> RestrictedTo(params T[] allowedValues);
     }
 
-    public interface IUnnamedSyntax : IConfigurationSyntax
+    public interface IPositionalSyntax : IConfigurationSyntax
     {
-        IUnnamedSyntax DescribedBy(string placeholder, string description);
+        IPositionalSyntax DescribedBy(string placeholder, string description);
 
-        IUnnamedSyntax Required();
+        IPositionalSyntax Required();
     }
 
     public interface ISwitchSyntax : IConfigurationSyntax

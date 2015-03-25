@@ -47,10 +47,10 @@ namespace Appccelerate.CommandLineParser.Sample
                     .WithSwitch("d", () => debug = true)
                         .HavingLongAlias("debug")
                         .DescribedBy("enables debug mode")
-                    .WithUnnamed(v => path = v)
+                    .WithPositional(v => path = v)
                         .Required()
                         .DescribedBy("path", "path to the output file.")
-                    .WithUnnamed(v => value = v)
+                    .WithPositional(v => value = v)
                         .DescribedBy("value", "some optional value.")
                 .BuildConfiguration();
 

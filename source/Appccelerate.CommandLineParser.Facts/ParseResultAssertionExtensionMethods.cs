@@ -29,7 +29,7 @@ namespace Appccelerate.CommandLineParser
 
     public static class ParseResultAssertionExtensionMethods
     {
-        public static AndConstraint<CommandLineConfiguration> HaveUnnamed(this ObjectAssertions assertions, string input, Func<bool> validation)
+        public static AndConstraint<CommandLineConfiguration> HavePositional(this ObjectAssertions assertions, string input, Func<bool> validation)
         {
             var subject = assertions.Subject as CommandLineConfiguration;
 
@@ -37,9 +37,9 @@ namespace Appccelerate.CommandLineParser
                 .ForCondition(subject != null)
                 .FailWith("object must be a non-null CommandLineConfiguration");
 
-            foreach (IUnnamedArgument unnamedArgument in subject.Arguments.OfType<IUnnamedArgument>())
+            foreach (IPositionalArgument positionalArgument in subject.Arguments.OfType<IPositionalArgument>())
             {
-                unnamedArgument.Handle(input);
+                positionalArgument.Handle(input);
             }
 
             Execute.Assertion

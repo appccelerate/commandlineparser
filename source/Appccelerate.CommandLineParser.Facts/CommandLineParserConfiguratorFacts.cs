@@ -37,17 +37,17 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
-        public void BuildsUnnamedArguments()
+        public void BuildsPositionalArguments()
         {
             const string Value = "value";
 
             string parsedArgument = null;
 
-            this.testee.WithUnnamed(x => parsedArgument = x);
+            this.testee.WithPositional(x => parsedArgument = x);
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            result.Should().HaveUnnamed(Value, () => parsedArgument == Value);
+            result.Should().HavePositional(Value, () => parsedArgument == Value);
         }
 
         [Fact]
@@ -141,15 +141,15 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
-        public void BuildsRequiredUnnamedArguments()
+        public void BuildsRequiredPositionalArguments()
         {
             this.testee
-                .WithUnnamed(x => { })
+                .WithPositional(x => { })
                     .Required();
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            result.RequiredArguments.OfType<IUnnamedArgument>().Should().HaveCount(1);
+            result.RequiredArguments.OfType<IPositionalArgument>().Should().HaveCount(1);
         }
 
         [Fact]
@@ -187,31 +187,31 @@ namespace Appccelerate.CommandLineParser
         }
 
         [Fact]
-        public void BuildsUnnamedArgumentsHelp()
+        public void BuildsPositionalArgumentsHelp()
         {
             const string Placeholder = "placeholder";
             const string Description = "description";
             this.testee
-                .WithUnnamed(x => { })
+                .WithPositional(x => { })
                     .DescribedBy(Placeholder, Description);
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            result.Help.OfType<UnnamedHelp<string>>()
+            result.Help.OfType<PositionalHelp<string>>()
                 .Should().ContainSingle(x =>
                     x.Placeholder == Placeholder &&
                     x.Description == Description);
         }
 
         [Fact]
-        public void BuildsUnnamedArgumentsHelp_WhenNoHelpWasSpecified()
+        public void BuildsPositionalArgumentsHelp_WhenNoHelpWasSpecified()
         {
             this.testee
-                .WithUnnamed(x => { });
+                .WithPositional(x => { });
 
             CommandLineConfiguration result = this.testee.BuildConfiguration();
 
-            result.Help.OfType<UnnamedHelp<string>>()
+            result.Help.OfType<PositionalHelp<string>>()
                 .Should().ContainSingle(x =>
                     x.Placeholder == "value" &&
                     x.Description == string.Empty);
