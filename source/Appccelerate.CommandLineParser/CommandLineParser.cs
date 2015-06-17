@@ -220,7 +220,7 @@ namespace Appccelerate.CommandLineParser
 
             private void HandlePositional(string arg)
             {
-                this.CheckThatThereIsAnPositionalArgumentPending();
+                this.CheckThatThereIsAPositionalArgumentPending();
 
                 IPositionalArgument positionalArgument = this.positionalArguments.Dequeue();
                 positionalArgument.Handle(arg);
@@ -236,7 +236,7 @@ namespace Appccelerate.CommandLineParser
                 }
             }
 
-            private void CheckThatThereIsAnPositionalArgumentPending()
+            private void CheckThatThereIsAPositionalArgumentPending()
             {
                 if (!this.positionalArguments.Any())
                 {
