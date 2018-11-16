@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CommandLineParserFacts.cs" company="Appccelerate">
-//   Copyright (c) 2008-2015
+//   Copyright (c) 2008-2018 Appccelerate
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -47,13 +47,13 @@ namespace Appccelerate.CommandLineParser
             var parsedArguments = new string[2];
 
             var positionalArguments = new[]
-                                       { 
-                                           new PositionalArgument<string>(x => parsedArguments[0] = x), 
+                                       {
+                                           new PositionalArgument<string>(x => parsedArguments[0] = x),
                                            new PositionalArgument<string>(x => parsedArguments[1] = x)
                                        };
             var configuration = new CommandLineConfiguration(
-                positionalArguments, 
-                NoLongAliases, 
+                positionalArguments,
+                NoLongAliases,
                 NoRequiredArguments,
                 NoHelp);
             var testee = new CommandLineParser(configuration);
@@ -75,11 +75,11 @@ namespace Appccelerate.CommandLineParser
 
             var namedArguments = new[]
                                  {
-                                     new NamedArgument<string>(FirstName, x => parsedArguments[0] = x), 
+                                     new NamedArgument<string>(FirstName, x => parsedArguments[0] = x),
                                      new NamedArgument<string>(SecondName, x => parsedArguments[1] = x)
                                  };
             var configuration = new CommandLineConfiguration(
-                namedArguments, 
+                namedArguments,
                 NoLongAliases,
                 NoRequiredArguments,
                 NoHelp);
@@ -103,7 +103,7 @@ namespace Appccelerate.CommandLineParser
 
             var namedArguments = new[]
                                  {
-                                     new NamedArgument<string>(FirstName, x => parsedArguments[0] = x), 
+                                     new NamedArgument<string>(FirstName, x => parsedArguments[0] = x),
                                      new NamedArgument<string>(SecondName, x => parsedArguments[1] = x)
                                  };
 
@@ -112,8 +112,8 @@ namespace Appccelerate.CommandLineParser
                                      { SecondLongAlias, namedArguments[1] }
                                   };
             var configuration = new CommandLineConfiguration(
-                namedArguments, 
-                longAliases, 
+                namedArguments,
+                longAliases,
                 NoRequiredArguments,
                 NoHelp);
             var testee = new CommandLineParser(configuration);
@@ -130,12 +130,12 @@ namespace Appccelerate.CommandLineParser
             bool secondAssigned = false;
             var switches = new[]
                                {
-                                   new Switch("switch", () => firstAssigned = true), 
-                                   new Switch("switch2", () => { }), 
+                                   new Switch("switch", () => firstAssigned = true),
+                                   new Switch("switch2", () => { }),
                                    new Switch("switchReloaded", () => secondAssigned = true)
                                };
             var configuration = new CommandLineConfiguration(
-                switches, 
+                switches,
                 NoLongAliases,
                 NoRequiredArguments,
                 NoHelp);
@@ -159,17 +159,17 @@ namespace Appccelerate.CommandLineParser
             bool secondAssigned = false;
             var switches = new[]
                                    {
-                                       new Switch(FirstSwitch, () => firstAssigned = true), 
+                                       new Switch(FirstSwitch, () => firstAssigned = true),
                                        new Switch(SecondSwitch, () => secondAssigned = true)
                                    };
             var longAliases = new Dictionary<string, IArgumentWithName>
                                   {
-                                     { FirstSwitchLongAlias, switches[0] }, 
+                                     { FirstSwitchLongAlias, switches[0] },
                                      { SecondSwitchLongAlias, switches[1] }
                                   };
 
             var configuration = new CommandLineConfiguration(
-                switches, 
+                switches,
                 longAliases,
                 NoRequiredArguments,
                 NoHelp);
@@ -204,7 +204,7 @@ namespace Appccelerate.CommandLineParser
             var namedArgument = new NamedArgument<string>("name", v => { });
 
             var configuration = new CommandLineConfiguration(
-                new[] { namedArgument }, 
+                new[] { namedArgument },
                 NoLongAliases,
                 new[] { namedArgument },
                 NoHelp);
@@ -223,7 +223,7 @@ namespace Appccelerate.CommandLineParser
             var namedArgument = new NamedArgument<string>("name", v => { });
 
             var configuration = new CommandLineConfiguration(
-                new[] { namedArgument }, 
+                new[] { namedArgument },
                 NoLongAliases,
                 NoRequiredArguments,
                 NoHelp);
@@ -240,7 +240,7 @@ namespace Appccelerate.CommandLineParser
             var positionalArgument = new PositionalArgument<string>(v => { });
 
             var configuration = new CommandLineConfiguration(
-                new[] { positionalArgument }, 
+                new[] { positionalArgument },
                 NoLongAliases,
                 new[] { positionalArgument },
                 NoHelp);
@@ -259,7 +259,7 @@ namespace Appccelerate.CommandLineParser
             var positionalArgument = new PositionalArgument<string>(v => { });
 
             var configuration = new CommandLineConfiguration(
-                new[] { positionalArgument }, 
+                new[] { positionalArgument },
                 NoLongAliases,
                 NoRequiredArguments,
                 NoHelp);
@@ -286,7 +286,7 @@ namespace Appccelerate.CommandLineParser
         [Fact]
         public void Fails_WhenUnknownNamedArgument()
         {
-            var configuration = new CommandLineConfiguration(NoArguments, NoLongAliases, NoRequiredArguments, NoHelp); 
+            var configuration = new CommandLineConfiguration(NoArguments, NoLongAliases, NoRequiredArguments, NoHelp);
             var testee = new CommandLineParser(configuration);
 
             var result = testee.Parse(new[] { "-unknown", "value" });
@@ -317,7 +317,7 @@ namespace Appccelerate.CommandLineParser
             string[] allowedValues = { "okay", Allowed, "allowedToo" };
 
             var configuration = new CommandLineConfiguration(
-                new[] { new NamedArgument<string>(Name, x => { }) { AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues) } }, 
+                new[] { new NamedArgument<string>(Name, x => { }) { AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues) } },
                 NoLongAliases,
                 NoRequiredArguments,
                 NoHelp);
@@ -336,7 +336,7 @@ namespace Appccelerate.CommandLineParser
             const string NotAllowed = "notAllowed";
 
             var configuration = new CommandLineConfiguration(
-                new[] { new NamedArgument<string>(Name, x => { }) { AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues) } }, 
+                new[] { new NamedArgument<string>(Name, x => { }) { AllowedValues = Optional<IEnumerable<string>>.CreateSet(allowedValues) } },
                 NoLongAliases,
                 NoRequiredArguments,
                 NoHelp);
@@ -366,7 +366,7 @@ namespace Appccelerate.CommandLineParser
         public void Fails_WhenNamedArgumentHasNoValue()
         {
             var configuration = new CommandLineConfiguration(
-                new[] { new NamedArgument<string>("known", s => { }) }, 
+                new[] { new NamedArgument<string>("known", s => { }) },
                 NoLongAliases,
                 NoRequiredArguments,
                 NoHelp);
@@ -385,7 +385,7 @@ namespace Appccelerate.CommandLineParser
             var namedArgument = new NamedArgument<string>("k", s => { });
 
             var configuration = new CommandLineConfiguration(
-                new[] { namedArgument }, 
+                new[] { namedArgument },
                 new Dictionary<string, IArgumentWithName>
                     {
                         { "known", namedArgument }

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Help.cs" company="Appccelerate">
-//   Copyright (c) 2008-2015
+//   Copyright (c) 2008-2018 Appccelerate
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Appccelerate.CommandLineParser.Specs
+namespace Appccelerate.CommandLineParser
 {
     using FluentAssertions;
 
@@ -31,43 +31,43 @@ namespace Appccelerate.CommandLineParser.Specs
             UsageComposer usageComposer,
             Usage usage)
         {
-            "establish a parsing configuration"._(() =>
+            "establish a parsing configuration".x(() =>
                 {
                     configuration = CommandLineParserConfigurator
                         .Create()
-                            .WithNamed("optional", _)
+                            .WithNamed("optional", Dummy)
                                 .DescribedBy("placeholder", "optional description")
-                            .WithNamed("required", _)
+                            .WithNamed("required", Dummy)
                                 .Required()
                                 .DescribedBy("placeholder", "required description")
                         .BuildConfiguration();
                 });
 
-            "establish a usage composer using the parsing configuration"._(() =>
+            "establish a usage composer using the parsing configuration".x(() =>
                 {
                     usageComposer = new UsageComposer(configuration);
                 });
 
-            "when composing usage"._(() =>
+            "when composing usage".x(() =>
                 usage = usageComposer.Compose());
 
-            "should list arguments"._(() =>
+            "should list arguments".x(() =>
                 usage.Arguments
                     .Should().Contain("-optional <placeholder>")
                     .And.Contain("-required <placeholder>"));
 
-            "should show whether an argument is optional or required"._(() =>
+            "should show whether an argument is optional or required".x(() =>
                 (usage.Arguments + " ")
                     .Should().Contain("[-optional <placeholder>]")
                     .And.Contain(" -required <placeholder> "));
 
-            "should list options per argument with description"._(() =>
+            "should list options per argument with description".x(() =>
                 usage.Options
                     .Should().Contain("optional description")
                     .And.Contain("required description"));
         }
 
-        private static void _(string value)
+        private static void Dummy(string value)
         {
         }
     }

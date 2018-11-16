@@ -1,18 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2050
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appccelerate.CommandLineParser", "Appccelerate.CommandLineParser\Appccelerate.CommandLineParser.csproj", "{3938743C-744F-4D4A-9AC6-CAEC985687FD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appccelerate.CommandLineParser.Facts", "Appccelerate.CommandLineParser.Facts\Appccelerate.CommandLineParser.Facts.csproj", "{13492172-10F5-46E9-8421-23C177413D79}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appccelerate.CommandLineParser.Specs", "Appccelerate.CommandLineParser.Specs\Appccelerate.CommandLineParser.Specs.csproj", "{6850F033-4E02-4A1B-8C32-E37957300982}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{14AA374C-5D8B-46AA-882D-969B9A2BA3E1}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appccelerate.CommandLineParser.Sample", "Appccelerate.CommandLineParser.Sample\Appccelerate.CommandLineParser.Sample.csproj", "{F07F2977-28B8-4B6A-BA15-0A1A74D113CA}"
 EndProject
@@ -41,5 +36,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {971D1CF8-623C-4B57-A86F-BAE3B9B5BAAC}
 	EndGlobalSection
 EndGlobal

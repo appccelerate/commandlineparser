@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="UsageComposer.cs" company="Appccelerate">
-//   Copyright (c) 2008-2015
+//   Copyright (c) 2008-2018 Appccelerate
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -45,14 +45,14 @@ namespace Appccelerate.CommandLineParser
         public Usage Compose()
         {
             return new Usage(
-                this.GetArguments(), 
+                this.GetArguments(),
                 this.GetOptions());
         }
 
         private string GetArguments()
         {
             StringBuilder arguments = new StringBuilder();
-            
+
             foreach (Help.Help help in this.configuration.Help)
             {
                 bool required = this.configuration.RequiredArguments.Contains(help.Argument);
@@ -87,7 +87,7 @@ namespace Appccelerate.CommandLineParser
                 help.WriteOptionTo(longAliases, options);
                 options.AppendLine();
             }
-            
+
             return options.ToString();
         }
     }

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="NamedHelp.cs" company="Appccelerate">
-//   Copyright (c) 2008-2015
+//   Copyright (c) 2008-2018 Appccelerate
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -53,9 +53,9 @@ namespace Appccelerate.CommandLineParser.Help
 
         private string GetPlaceholderPart(NamedArgument<T> namedArgument)
         {
-            return namedArgument.AllowedValues.IsSet ? 
-                string.Format("{0} = {{ {1} }}", this.ValuePlaceholder, string.Join(" | ", namedArgument.AllowedValues.Value)) : 
-                string.Format("{0}", this.ValuePlaceholder);
+            return namedArgument.AllowedValues.IsSet
+                ? $"{this.ValuePlaceholder} = {{ {string.Join(" | ", namedArgument.AllowedValues.Value)} }}"
+                : $"{this.ValuePlaceholder}";
         }
     }
 }

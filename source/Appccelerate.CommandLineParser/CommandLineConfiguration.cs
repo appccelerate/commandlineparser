@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CommandLineConfiguration.cs" company="Appccelerate">
-//   Copyright (c) 2008-2015
+//   Copyright (c) 2008-2018 Appccelerate
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -23,14 +23,14 @@ namespace Appccelerate.CommandLineParser
     using Appccelerate.CommandLineParser.Arguments;
 
     /// <summary>
-    /// Use the <see cref="CommandLineParserConfigurator"/> to create a<see cref="CommandLineConfiguration"/> 
-    /// and pass it to a <see cref="CommandLineParser"/> for parsing 
+    /// Use the <see cref="CommandLineParserConfigurator"/> to create a<see cref="CommandLineConfiguration"/>
+    /// and pass it to a <see cref="CommandLineParser"/> for parsing
     /// and a <see cref="UsageComposer"/> to compose a help message in case of a parsing error.
     /// </summary>
     public class CommandLineConfiguration
     {
         public CommandLineConfiguration(
-            IEnumerable<IArgument> arguments, 
+            IEnumerable<IArgument> arguments,
             IDictionary<string, IArgumentWithName> longAliases,
             IEnumerable<IArgument> requiredArguments,
             IEnumerable<Help.Help> help)

@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Help{T}.cs" company="Appccelerate">
-//   Copyright (c) 2008-2015
+//   Copyright (c) 2008-2018 Appccelerate
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -23,7 +23,8 @@ namespace Appccelerate.CommandLineParser.Help
 
     using Appccelerate.CommandLineParser.Arguments;
 
-    public abstract class Help<T> : Help where T : Argument
+    public abstract class Help<T> : Help
+        where T : Argument
     {
         protected Help(T argument)
             : base(argument)
@@ -33,7 +34,7 @@ namespace Appccelerate.CommandLineParser.Help
         }
 
         public string Description { get; set; }
-        
+
         protected new T Argument { get; private set; }
 
         protected string GetAliasPart(IEnumerable<string> longAliases)

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CommandLineParserConfiguratorFacts.cs" company="Appccelerate">
-//   Copyright (c) 2008-2015
+//   Copyright (c) 2008-2018 Appccelerate
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ namespace Appccelerate.CommandLineParser
         {
             const string Name = "name";
             const string LongAlias = "longAlias";
-            
+
             this.testee.WithNamed(Name, x => { })
                 .HavingLongAlias(LongAlias);
 
@@ -222,7 +222,7 @@ namespace Appccelerate.CommandLineParser
         {
             const string Name = "name";
             const string Description = "description";
-            
+
             this.testee
                 .WithSwitch(Name, () => { })
                     .DescribedBy(Description);
@@ -238,7 +238,7 @@ namespace Appccelerate.CommandLineParser
         public void BuildsSwitchHelp_WhenNoHelpWasSpecified()
         {
             const string Name = "name";
-            
+
             this.testee
                 .WithSwitch(Name, () => { });
 

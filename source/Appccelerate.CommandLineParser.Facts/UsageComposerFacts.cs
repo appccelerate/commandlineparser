@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="UsageComposerFacts.cs" company="Appccelerate">
-//   Copyright (c) 2008-2015
+//   Copyright (c) 2008-2018 Appccelerate
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ namespace Appccelerate.CommandLineParser
         private readonly UsageComposer testee;
 
         private readonly List<IArgument> arguments;
-        
+
         private readonly Dictionary<string, IArgumentWithName> longAliases;
         private readonly List<IArgument> requiredArguments;
         private readonly List<Help.Help> help;
@@ -132,9 +132,9 @@ namespace Appccelerate.CommandLineParser
         public void ComposesOptionsForNamedArguments_WithRestrictedValues()
         {
             this.AddNamedArgument(
-                "name", 
-                "placeholder", 
-                "description", 
+                "name",
+                "placeholder",
+                "description",
                 Optional<IEnumerable<string>>.CreateSet(new[] { "firstAllowed", "secondAllowed" }));
 
             Usage result = this.testee.Compose();
@@ -217,15 +217,15 @@ namespace Appccelerate.CommandLineParser
 
         private NamedArgument<string> AddNamedArgument(string name, string valuePlaceholder, string description, Optional<IEnumerable<string>> allowedValues)
         {
-            var namedArgument = new NamedArgument<string>(name, _)
-                                    {
-                                        AllowedValues = allowedValues
-                                    };
+            var namedArgument = new NamedArgument<string>(name, Dummy)
+            {
+                AllowedValues = allowedValues
+            };
             var namedHelp = new NamedHelp<string>(namedArgument)
-                                      {
-                                          ValuePlaceholder = valuePlaceholder,
-                                          Description = description
-                                      };
+            {
+                ValuePlaceholder = valuePlaceholder,
+                Description = description
+            };
             this.arguments.Add(namedArgument);
             this.help.Add(namedHelp);
 
@@ -234,13 +234,13 @@ namespace Appccelerate.CommandLineParser
 
         private PositionalArgument<string> AddpositionalArgument(string placeholder, string description)
         {
-            var positionalArgument = new PositionalArgument<string>(_);
+            var positionalArgument = new PositionalArgument<string>(Dummy);
             var positionalHelp = new PositionalHelp<string>(positionalArgument)
-                                  {
-                                      Placeholder = placeholder,
-                                      Description = description
-                                  };
-            
+            {
+                Placeholder = placeholder,
+                Description = description
+            };
+
             this.arguments.Add(positionalArgument);
             this.help.Add(positionalHelp);
 
@@ -249,12 +249,12 @@ namespace Appccelerate.CommandLineParser
 
         private Switch AddSwitch(string name, string description)
         {
-            var switchArgument = new Switch(name, _);
+            var switchArgument = new Switch(name, Dummy);
             var switchHelp = new SwitchHelp(switchArgument)
-                                 {
-                                     Description = description
-                                 };
-            
+            {
+                Description = description
+            };
+
             this.arguments.Add(switchArgument);
             this.help.Add(switchHelp);
 
@@ -266,11 +266,11 @@ namespace Appccelerate.CommandLineParser
             return string.Join(Environment.NewLine, lines) + Environment.NewLine;
         }
 
-        private static void _(string v)
+        private static void Dummy(string v)
         {
         }
 
-        private static void _()
+        private static void Dummy()
         {
         }
     }
