@@ -33,9 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Appccelerate.Development" Version="2.2.0" PrivateAssets="all">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Appccelerate.VersionTask" Version="1.39.0" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
