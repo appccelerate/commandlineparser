@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Appccelerate.CommandLinePar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Appccelerate.CommandLineParser.Specs", "Appccelerate.CommandLineParser.Specs\Appccelerate.CommandLineParser.Specs.csproj", "{6850F033-4E02-4A1B-8C32-E37957300982}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appccelerate.CommandLineParser.Sample", "Appccelerate.CommandLineParser.Sample\Appccelerate.CommandLineParser.Sample.csproj", "{E04A2DFE-B3B0-4487-896A-4FA0710853DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{6850F033-4E02-4A1B-8C32-E37957300982}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6850F033-4E02-4A1B-8C32-E37957300982}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6850F033-4E02-4A1B-8C32-E37957300982}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E04A2DFE-B3B0-4487-896A-4FA0710853DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E04A2DFE-B3B0-4487-896A-4FA0710853DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E04A2DFE-B3B0-4487-896A-4FA0710853DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E04A2DFE-B3B0-4487-896A-4FA0710853DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
