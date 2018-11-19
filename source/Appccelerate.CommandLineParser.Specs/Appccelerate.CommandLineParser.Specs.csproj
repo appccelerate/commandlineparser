@@ -26,17 +26,14 @@
   <ItemGroup>
     <None Remove="Analyzers.ruleset" />
     <None Remove="StyleCop.Cache" />
-    <None Remove="stylecop.json" />
   </ItemGroup>
 
   <ItemGroup>
     <AdditionalFiles Include="Analyzers.ruleset" />
-    <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.5.1" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="Xbehave.Core" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
@@ -49,12 +46,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Appccelerate.CommandLineParser\Appccelerate.CommandLineParser.csproj" />   
+    <ProjectReference Include="..\Appccelerate.CommandLineParser\Appccelerate.CommandLineParser.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System.Configuration" />
     <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>  
+  </ItemGroup>
 
 </Project>

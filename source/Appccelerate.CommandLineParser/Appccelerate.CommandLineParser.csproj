@@ -29,7 +29,6 @@
 
   <ItemGroup>
     <AdditionalFiles Include="Analyzers.ruleset" />
-    <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
 
   <ItemGroup>
