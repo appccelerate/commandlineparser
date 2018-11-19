@@ -22,12 +22,12 @@
     </frameworkAssemblies>
     <dependencies>
       <dependency id="Appccelerate.Fundamentals" version="[2.8,3.0)" />
-    </dependencies>	
+    </dependencies>
   </metadata>
   <files>
-    <file src="bin\Release\Appccelerate.CommandLineParser.dll" target="lib\net45" />
-    <file src="bin\Release\Appccelerate.CommandLineParser.pdb" target="lib\net45" />
-    <file src="bin\Release\Appccelerate.CommandLineParser.xml" target="lib\net45" />
+    <file src="bin\Release\netstandard2.0\Appccelerate.CommandLineParser.dll" target="lib\netstandard2.0" />
+    <file src="bin\Release\netstandard2.0\Appccelerate.CommandLineParser.pdb" target="lib\netstandard2.0" />
+    <file src="bin\Release\netstandard2.0\Appccelerate.CommandLineParser.xml" target="lib\netstandard2.0" />
     <file src="**\*.cs" target="src" />
-  </files>  
+  </files>
 </package>
