@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2050
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appccelerate.CommandLineParser", "Appccelerate.CommandLineParser\Appccelerate.CommandLineParser.csproj", "{3938743C-744F-4D4A-9AC6-CAEC985687FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Appccelerate.CommandLineParser", "Appccelerate.CommandLineParser\Appccelerate.CommandLineParser.csproj", "{3938743C-744F-4D4A-9AC6-CAEC985687FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appccelerate.CommandLineParser.Facts", "Appccelerate.CommandLineParser.Facts\Appccelerate.CommandLineParser.Facts.csproj", "{13492172-10F5-46E9-8421-23C177413D79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Appccelerate.CommandLineParser.Facts", "Appccelerate.CommandLineParser.Facts\Appccelerate.CommandLineParser.Facts.csproj", "{13492172-10F5-46E9-8421-23C177413D79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appccelerate.CommandLineParser.Specs", "Appccelerate.CommandLineParser.Specs\Appccelerate.CommandLineParser.Specs.csproj", "{6850F033-4E02-4A1B-8C32-E37957300982}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Appccelerate.CommandLineParser.Specs", "Appccelerate.CommandLineParser.Specs\Appccelerate.CommandLineParser.Specs.csproj", "{6850F033-4E02-4A1B-8C32-E37957300982}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appccelerate.CommandLineParser.Sample", "Appccelerate.CommandLineParser.Sample\Appccelerate.CommandLineParser.Sample.csproj", "{F07F2977-28B8-4B6A-BA15-0A1A74D113CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appccelerate.CommandLineParser.Sample", "Appccelerate.CommandLineParser.Sample\Appccelerate.CommandLineParser.Sample.csproj", "{E04A2DFE-B3B0-4487-896A-4FA0710853DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{6850F033-4E02-4A1B-8C32-E37957300982}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6850F033-4E02-4A1B-8C32-E37957300982}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6850F033-4E02-4A1B-8C32-E37957300982}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F07F2977-28B8-4B6A-BA15-0A1A74D113CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F07F2977-28B8-4B6A-BA15-0A1A74D113CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F07F2977-28B8-4B6A-BA15-0A1A74D113CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F07F2977-28B8-4B6A-BA15-0A1A74D113CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E04A2DFE-B3B0-4487-896A-4FA0710853DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E04A2DFE-B3B0-4487-896A-4FA0710853DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E04A2DFE-B3B0-4487-896A-4FA0710853DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E04A2DFE-B3B0-4487-896A-4FA0710853DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
